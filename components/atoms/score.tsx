@@ -20,12 +20,9 @@ const Score = () => {
         </p>
       </div>
       <div className="flex flex-col justify-center items-center gap-4">
-        <p className="text-dark-blue dark:text-white font-bold xs:text-5xl sm:text-5xl lg:text-9xl">
-          {score}
+        <p className="text-dark-blue dark:text-white my-10 font-bold xs:text-5xl sm:text-5xl lg:text-9xl">
+          {score}/{selectedQuizz.questions.length}
         </p>
-        <span className="text-dark-blue dark:text-white text-sm font-thin">
-          Out of {selectedQuizz.questions.length}
-        </span>
       </div>
     </div>
   );

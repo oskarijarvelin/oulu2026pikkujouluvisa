@@ -17,9 +17,8 @@ const Game = () => {
   const [shouldAnimateAnswers, setShouldAnimateAnswers] = useState(false);
 
   useEffect(() => {
-    // Activar la animación cuando cambie la pregunta
     setShouldAnimateQuestion(true);
-    setShouldAnimateAnswers(true); // Reiniciar la animación de las respuestas
+    setShouldAnimateAnswers(true); 
   }, [currentQuestion]);
 
   return (
@@ -38,8 +37,8 @@ const Game = () => {
               key={currentQuestion}
               className="flex flex-col gap-4"
             >
-              <p className="italic xs:text-sm md:text-md text-gray-navy dark:text-light-blue xl:text-xl" >
-                Question {currentQuestion + 1} of {questions.length}
+              <p className="italic xs:text-sm md:text-md text-perameri dark:text-jakala xl:text-xl" >
+                Kysymys {currentQuestion + 1} / {questions.length}
               </p>
               <CurrentQuestion data={question} />
             </motion.div>
@@ -57,7 +56,7 @@ const Game = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="xs:mt-2 lg:mt-auto xl:mt-20 w-full "
-              key={currentQuestion} // Asegúrate de proporcionar una clave única para que React maneje las animaciones correctamente
+              key={currentQuestion} 
             >
               <Progress
                 total={questions.length}
@@ -78,7 +77,7 @@ const Game = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: 20 }}
             className="flex flex-col gap-y-4 justify-center w-full"
-            key={currentQuestion} // Asegúrate de proporcionar una clave única para que React maneje las animaciones correctamente
+            key={currentQuestion}
           >
             <Answers
               data={question.options}

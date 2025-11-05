@@ -28,13 +28,13 @@ export default function Home() {
           <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col xs:gap-4 md:gap-10 lg:mt-28 xl:mt-0"
+            className="flex flex-col justify-center xs:gap-4 md:gap-10 lg:mt-28 xl:mt-0"
           >
-            <h1 className="xs:text-4xl md:text-5xl font-normal text-dark-blue dark:text-white xl:text-6xl 2xl:text-6xl">
-              Welcome to the <span className="font-bold">Frontend Quizz!</span>
+            <h1 className="xs:text-4xl md:text-5xl font-normal text-yotaivas dark:text-valkoinen xl:text-6xl 2xl:text-6xl">
+              Tämä on Oulu2026 <span className="font-bold uppercase">pikkujouluvisa</span>
             </h1>
-            <p className="text-gray-navy italic dark:text-light-blue xs:text-sm xl:text-xl">
-              Pick a subject to get started.
+            <p className="text-perameri italic dark:text-jakala xs:text-sm xl:text-xl">
+              Valitse pikkujouluvisan aihealue
             </p>
           </MotionDiv>
           <MotionDiv
@@ -52,13 +52,13 @@ export default function Home() {
           <MotionDiv
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="flex flex-col xs:gap-3 md:gap-6 h-full lg:mt-20"
+            className="flex flex-col justify-center xs:gap-3 md:gap-6 h-full"
           >
-            <h1 className="xs:text-4xl md:text-5xl font-normal text-dark-blue dark:text-white xl:text-6xl">
-              Quizz Completed!
+            <h1 className="xs:text-4xl md:text-5xl font-normal text-yotaivas dark:text-valkoinen xl:text-6xl">
+              Sait pisteitä
             </h1>
-            <p className="xs:text-4xl md:text-5xl font-bold text-dark-blue dark:text-white xl:text-6xl">
-              You scored...
+            <p className="xs:text-4xl md:text-5xl uppercase font-bold text-yotaivas dark:text-valkoinen xl:text-6xl">
+              yhteensä
             </p>
           </MotionDiv>
           <MotionDiv
@@ -68,10 +68,10 @@ export default function Home() {
           >
             <Score />
             <button
-              className="w-full bg-purple py-4 px-5 rounded-xl shadow-lg text-white font-semibold text-lg text-center"
+              className="w-full bg-perameri py-4 px-5 rounded-xl shadow-lg text-valkoinen font-semibold text-lg text-center"
               onClick={reset}
             >
-              Play Again
+              Pelaa uudestaan
             </button>
           </MotionDiv>
         </>

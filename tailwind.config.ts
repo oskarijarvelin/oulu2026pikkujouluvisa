@@ -33,14 +33,24 @@ const config: Config = {
           "url('/assets/images/pattern-background-mobile-dark.svg')",
       },
       colors: {
-        "light-blue": "#ABC1E1",
-        purple: "#A729F5",
-        "dark-blue": "#313E51",
-        slate: "#3B4D66",
-        "gray-navy": "#626C7F",
-        green: "#26D782",
-        white: "#F4F6FA",
-        red: "#EE5454",
+        "light-blue": "#E1E1E1", // #5964E0, nappulat
+        purple: "#14502E", // #C882A0, painike aktiivinen
+        "dark-blue": "#002350", // #002350, taustaväri
+        slate: "#5964E0", // #F4F6F8, vaihtoehtojen taustaväri
+        "gray-navy": "#002350",
+        green: "#14502E",
+        white: "#E1E1E1",
+        red: "#F1334B",
+        "yotaivas": "#002350",
+        "metsa": "#14502E",
+        "perameri": "#4542D9",
+        "hilla": "#F06721",
+        "puolukka": "#F1334B",
+        "kanerva": "#C882A0",
+        "jakala": "#D4D1C6",
+        "harmaa": "#E1E1E1",
+        "musta": "#000000",
+        "valkoinen": "#FFFFFF"
       },
     },
   },

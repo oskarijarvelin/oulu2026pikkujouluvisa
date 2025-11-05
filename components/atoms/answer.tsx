@@ -22,28 +22,28 @@ const Answer = ({
       <button
         onClick={() => handleSelectAnswer(answer)}
         className={cn(
-          selectedAns === answer && "ring-purple ring-1",
+          selectedAns === answer && "ring-perameri ring-1",
           isCorrectUserAnswer && selectedAns === answer && "ring-green",
 
-          "w-full flex items-center gap-x-4 group bg-[#fff] dark:bg-slate py-4 px-5 rounded-xl shadow-lg hover:ring-1 hover:ring-purple transition-all font-semibold text-sm text-dark-blue dark:text-white text-center",
-          isCorrectUserAnswer === false && selectedAns === answer && "ring-red"
+          "w-full flex items-center gap-x-4 group bg-valkoinen dark:bg-jakala py-4 px-5 rounded-xl shadow-lg transition-all font-semibold text-sm text-yotaivas hover:text-perameri",
+          isCorrectUserAnswer === false && selectedAns === answer && "ring-puolukka"
         )}
       >
         <span
           className={cn(
             selectedAns === answer
-              ? "bg-purple text-white"
-              : "bg-white dark:text-dark-blue group-hover:text-purple group-hover:bg-[#F6E7FF] transition-all",
+              ? "bg-perameri text-valkoinen"
+              : "bg-harmaa dark:bg-yotaivas dark:text-jakala group-hover:text-perameri dark:group-hover:text-valkoinen group-hover:bg-harmaa dark:group-hover:bg-yotaivas transition-all",
             "text-lg rounded-lg py-2 px-4  ",
-            isCorrectUserAnswer === false && selectedAns === answer && "bg-red",
-            isCorrectUserAnswer && selectedAns === answer && "bg-green"
+            isCorrectUserAnswer === false && selectedAns === answer && "bg-puolukka",
+            isCorrectUserAnswer && selectedAns === answer && "bg-metsa"
           )}
         >
           {answerLabels[index]}
         </span>
         <span className="xl:text-lg">{answer}</span>
         {isCorrectUserAnswer && selectedAns === answer && (
-          <span className="text-green-500 ml-auto">
+          <span className="text-metsa ml-auto">
             <Image
               src="/assets/images/icon-correct.svg"
               alt="check"
@@ -53,7 +53,7 @@ const Answer = ({
           </span>
         )}
         {isCorrectUserAnswer === false && selectedAns === answer && (
-          <span className="text-red-500 ml-auto">
+          <span className="text-puolukka ml-auto">
             <Image
               src="/assets/images/icon-error.svg"
               alt="cross"

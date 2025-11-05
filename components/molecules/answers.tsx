@@ -70,9 +70,9 @@ const Answers = ({
 
       <button
         onClick={handleSubmit}
-        className="w-full bg-purple py-4 px-5 rounded-xl shadow-lg text-white font-semibold text-lg text-center"
+        className="w-full bg-perameri py-4 px-5 rounded-xl shadow-lg text-valkoinen font-semibold text-lg text-center"
       >
-        {submitted ? "Next Question" : "Submit Answer"}
+        {submitted ? "Seuraava kysymys" : "Tarkista vastaus"}
       </button>
     </>
   );
