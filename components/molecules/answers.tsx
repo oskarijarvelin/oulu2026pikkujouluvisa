@@ -2,12 +2,12 @@
 import { cn } from "@/lib/utils";
 import { useQuestionStore } from "@/store/quiz-store";
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Answer from "../atoms/answer";
 
 type AnswersProps = {
   data: string[];
-  handleAnswer: (questionId: number, answer: string) => void;
+  handleAnswer: (questionId: number, answer: string, timeTakenMs?: number) => void; // changed signature
   questionId: number;
   goNextQuestion: () => void;
 };
@@ -26,10 +26,19 @@ const Answers = ({
 
   const answerLabels = ["A", "B", "C", "D"];
 
+  // track when the question was shown
+  const startTimeRef = useRef<number>(performance.now());
+
+  // reset timer when questionId or data changes
+  useEffect(() => {
+    startTimeRef.current = performance.now();
+  }, [questionId, data]);
+
   const handleSelectAnswer = (answer: string) => {
     if (selectedAns) return; // Prevent changing answer after selection
+    const timeTakenMs = Math.max(0, performance.now() - startTimeRef.current);
     setSelectedAns(answer);
-    handleAnswer(questionId, answer);
+    handleAnswer(questionId, answer, timeTakenMs); // pass time to handler
 
     // Auto advance to next question after a delay
     setTimeout(() => {
@@ -38,6 +47,7 @@ const Answers = ({
       } else {
         goNextQuestion();
         setSelectedAns("");
+        startTimeRef.current = performance.now(); // reset for next question
       }
     }, 1500); // 1.5 second delay before moving to next question
   };

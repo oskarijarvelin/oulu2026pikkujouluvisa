@@ -35,7 +35,6 @@ const Score = () => {
     date?: string;
   }[];
   const scores = quizScores.map((s) => s.score);
-  const bestScore = scores.length ? Math.max(...scores) : 0;
 
   return (
     <div className="flex flex-col gap-4 bg-[#fff] dark:bg-slate p-10 rounded-xl">
@@ -54,11 +53,6 @@ const Score = () => {
         <p className="text-dark-blue dark:text-white my-10 font-bold xs:text-5xl sm:text-5xl lg:text-9xl">
           {score}/{selectedQuizz.questions.length}
         </p>
-        {quizScores.length > 1 && (
-          <p className="text-dark-blue dark:text-white text-lg">
-            Best Score: {bestScore}/{selectedQuizz.questions.length}
-          </p>
-        )}
       </div>
     </div>
   );
