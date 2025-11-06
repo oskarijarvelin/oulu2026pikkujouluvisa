@@ -108,7 +108,7 @@ export const useQuestionStore = create<State>()(
       };
     },
     {
-      name: "quizz",
+      name: "visat",
     }
   )
 );

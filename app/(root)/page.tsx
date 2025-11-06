@@ -4,7 +4,7 @@ import MaxWidthWrapper from "@/components/atoms/max-width-wrapper";
 import Score from "@/components/atoms/score";
 import Subjects from "@/components/atoms/subjects";
 import { useQuestionStore } from "@/store/quiz-store";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import { MotionDiv } from "@/components/animated/motion-div";
 import { cn } from "@/lib/utils";
 
@@ -12,9 +12,16 @@ export default function Home() {
   const { fetchQuizzes, quizzes, selectedQuizz, hasCompleteAll, reset } =
     useQuestionStore();
 
+  const [playerName, setPlayerName] = useState<string | null>(null);
+
   useEffect(() => {
     fetchQuizzes();
   }, [fetchQuizzes]);
+
+  useEffect(() => {
+    const saved = localStorage.getItem("playerName");
+    if (saved) setPlayerName(saved);
+  }, []);
 
   return (
     <MaxWidthWrapper
@@ -31,11 +38,8 @@ export default function Home() {
             className="flex flex-col justify-center xs:gap-4 md:gap-10 lg:mt-28 xl:mt-0"
           >
             <h1 className="xs:text-4xl md:text-5xl font-normal text-yotaivas dark:text-valkoinen xl:text-6xl 2xl:text-6xl">
-              Tämä on Oulu2026 <span className="font-bold uppercase">pikkujouluvisa</span>
+              <span className="xs:text-2xl md:text-3xl">Tervetuloa pelaamaan Oulu2026</span> <span className="font-bold my-1 uppercase">pikkujouluvisaa</span>
             </h1>
-            <p className="text-perameri italic dark:text-jakala xs:text-sm xl:text-xl">
-              Valitse pikkujouluvisan aihealue
-            </p>
           </MotionDiv>
           <MotionDiv
             initial={{ opacity: 0, y: -20 }}
@@ -71,7 +75,7 @@ export default function Home() {
               className="w-full bg-perameri py-4 px-5 rounded-xl shadow-lg text-valkoinen font-semibold text-lg text-center"
               onClick={reset}
             >
-              Pelaa uudestaan
+              Valitse seuraava visa
             </button>
           </MotionDiv>
         </>

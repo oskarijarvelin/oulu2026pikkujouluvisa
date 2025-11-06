@@ -2,10 +2,41 @@
 import { backgroundColors } from "@/lib/utils";
 import { useQuestionStore } from "@/store/quiz-store";
 import Image from "next/image";
+import { useEffect } from "react";
 
 const Score = () => {
   const { selectedQuizz, score } = useQuestionStore();
+
+  useEffect(() => {
+    if (selectedQuizz && score !== undefined) {
+      // Get existing scores from localStorage
+      const existingScores = JSON.parse(localStorage.getItem("quizScores") || "{}");
+
+      // Update scores for this quiz
+      const quizScores = existingScores[selectedQuizz.title] || [];
+      quizScores.push({
+        score: score,
+        total: selectedQuizz.questions.length,
+        date: new Date().toISOString(),
+      });
+
+      // Save back to localStorage
+      existingScores[selectedQuizz.title] = quizScores;
+      localStorage.setItem("quizScores", JSON.stringify(existingScores));
+    }
+  }, [selectedQuizz, score]);
+
   if (!selectedQuizz) return null;
+
+  // Get historical scores for this quiz
+  const quizScores = (JSON.parse(localStorage.getItem("quizScores") || "{}")[selectedQuizz.title] || []) as {
+    score: number;
+    total?: number;
+    date?: string;
+  }[];
+  const scores = quizScores.map((s) => s.score);
+  const bestScore = scores.length ? Math.max(...scores) : 0;
+
   return (
     <div className="flex flex-col gap-4 bg-[#fff] dark:bg-slate p-10 rounded-xl">
       <div className="flex gap-x-2 items-center justify-center">
@@ -23,6 +54,11 @@ const Score = () => {
         <p className="text-dark-blue dark:text-white my-10 font-bold xs:text-5xl sm:text-5xl lg:text-9xl">
           {score}/{selectedQuizz.questions.length}
         </p>
+        {quizScores.length > 1 && (
+          <p className="text-dark-blue dark:text-white text-lg">
+            Best Score: {bestScore}/{selectedQuizz.questions.length}
+          </p>
+        )}
       </div>
     </div>
   );

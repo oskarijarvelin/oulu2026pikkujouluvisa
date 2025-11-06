@@ -19,7 +19,6 @@ const Answers = ({
   goNextQuestion,
 }: AnswersProps) => {
   const [selectedAns, setSelectedAns] = useState("");
-  const [submitted, setSubmitted] = useState<boolean>(false);
   const { questions, onCompleteQuestions } = useQuestionStore();
   const isCorrectUserAnswer = questions.find(
     (q) => q.id === questionId
@@ -28,28 +27,19 @@ const Answers = ({
   const answerLabels = ["A", "B", "C", "D"];
 
   const handleSelectAnswer = (answer: string) => {
-    if (submitted) return;
-    if (selectedAns === answer) {
-      setSelectedAns("");
-      return;
-    }
+    if (selectedAns) return; // Prevent changing answer after selection
     setSelectedAns(answer);
-  };
+    handleAnswer(questionId, answer);
 
-  const handleSubmit = () => {
-    if (submitted) {
+    // Auto advance to next question after a delay
+    setTimeout(() => {
       if (questions.every((q) => q.userSelectedAnswer != null)) {
         onCompleteQuestions();
-        return;
+      } else {
+        goNextQuestion();
+        setSelectedAns("");
       }
-      goNextQuestion();
-      setSelectedAns("");
-      setSubmitted(false);
-      return;
-    }
-    if (!selectedAns) return;
-    handleAnswer(questionId, selectedAns);
-    setSubmitted(true);
+    }, 1500); // 1.5 second delay before moving to next question
   };
 
   return (
@@ -67,13 +57,6 @@ const Answers = ({
           />
         ))}
       </ul>
-
-      <button
-        onClick={handleSubmit}
-        className="w-full bg-perameri py-4 px-5 rounded-xl shadow-lg text-valkoinen font-semibold text-lg text-center"
-      >
-        {submitted ? "Seuraava kysymys" : "Tarkista vastaus"}
-      </button>
     </>
   );
 };
