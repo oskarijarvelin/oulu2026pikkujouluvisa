@@ -37,8 +37,8 @@ export default function Home() {
             animate={{ opacity: 1, y: 0 }}
             className="flex flex-col justify-center xs:gap-4 md:gap-10 lg:mt-28 xl:mt-0"
           >
-            <h1 className="xs:text-4xl md:text-5xl font-normal text-yotaivas dark:text-valkoinen xl:text-6xl 2xl:text-6xl">
-              <span className="xs:text-2xl md:text-3xl">Tervetuloa pelaamaan Oulu2026</span> <span className="font-bold my-1 uppercase">pikkujouluvisaa</span>
+            <h1 className="xs:text-4xl md:text-4xl xl:text-4xl 2xl:text-5xl font-normal text-yotaivas dark:text-valkoinen">
+              <span className="xs:text-xl md:text-xl xl:text-2xl 2xl:text-3xl">Tervetuloa pelaamaan Oulu2026-</span> <span className="font-bold my-1 uppercase">pikkujouluvisaa</span>
             </h1>
           </MotionDiv>
           <MotionDiv

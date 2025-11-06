@@ -94,7 +94,7 @@ export default function Home() {
         animate={{ opacity: 1, y: 0 }}
         className="flex flex-col justify-center xs:gap-4 md:gap-10 lg:mt-28 xl:mt-0"
       >
-        <p className="text-perameri dark:text-jakala"><Link href="/">&larr; Takaisin visoihin</Link></p>
+        <p className="text-perameri dark:text-jakala"><Link href="/">&larr; Takaisin visailemaan</Link></p>
         <h1 className="xs:text-4xl md:text-5xl font-normal text-yotaivas dark:text-valkoinen xl:text-6xl 2xl:text-6xl">
           <span className="xs:text-2xl md:text-3xl">
             Oulu2026-pikkujouluvisan
@@ -114,16 +114,16 @@ export default function Home() {
                 <table className="min-w-full text-sm divide-y divide-gray-200 dark:divide-gray-700">
                   <thead>
                     <tr>
-                      <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-valkoinen">
+                      <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-jakala">
                         #
                       </th>
-                      <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-valkoinen">
+                      <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-jakala">
                         Nimi
                       </th>
-                      <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-valkoinen">
+                      <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-jakala">
                         Pisteet
                       </th>
-                      <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-valkoinen">
+                      <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-jakala">
                         Edistyminen
                       </th>
                     </tr>
@@ -138,18 +138,13 @@ export default function Home() {
                           key={row.name}
                           className={cn(
                             "transition-colors",
-                            isCurrent ? "bg-perameri/10 dark:bg-perameri/20" : ""
+                            isCurrent ? "bg-perameri/10 dark:bg-valkoinen/10 text-yotaivas dark:text-valkoinen" : "text-yotaivas dark:text-jakala"
                           )}
                         >
                           <td className="py-3 px-3">{i + 1}</td>
                           <td className="py-3 px-3">
                             <div className="flex items-center gap-2">
-                              <span
-                                className={cn(
-                                  "font-medium",
-                                  isCurrent ? "text-perameri" : "text-yotaivas dark:text-valkoinen"
-                                )}
-                              >
+                              <span className="font-medium">
                                 {row.name}
                               </span>
                             </div>
@@ -157,9 +152,8 @@ export default function Home() {
                           <td className="py-3 px-3">
                             {row.total}/{totalPossible}
                           </td>
-                          {/* changed: show percentage of quizzes played */}
                           <td className="py-3 px-3">
-                            {percent}% 
+                            {percent}%
                           </td>
                         </tr>
                       );
