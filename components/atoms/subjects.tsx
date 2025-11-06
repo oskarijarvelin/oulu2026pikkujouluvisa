@@ -24,10 +24,17 @@ const Subjects = ({ data }: SubjectsProps) => {
   const [playerName, setPlayerName] = useState<string | null>(null);
   const [nameInput, setNameInput] = useState("");
 
+  // Track client mount to avoid using localStorage during SSR
+  const [isMounted, setIsMounted] = useState(false);
   useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  useEffect(() => {
+    if (!isMounted) return;
     const saved = localStorage.getItem("playerName");
     if (saved) setPlayerName(saved);
-  }, []);
+  }, [isMounted]);
 
   const handleSaveName = (e?: React.FormEvent) => {
     e?.preventDefault();
@@ -40,9 +47,14 @@ const Subjects = ({ data }: SubjectsProps) => {
 
   // Get scores from localStorage — always return total questions, best may be null
   const getQuizScore = (title: string) => {
+    const totalQuestions = data.find((q) => q.title === title)?.questions.length || 0;
+
+    if (!isMounted || typeof window === "undefined") {
+      return { best: null as number | null, total: totalQuestions };
+    }
+
     const scores = JSON.parse(localStorage.getItem("quizScores") || "{}");
     const quizScores = scores[title] || [];
-    const totalQuestions = data.find((q) => q.title === title)?.questions.length || 0;
 
     if (quizScores.length === 0) {
       return { best: null as number | null, total: totalQuestions };
@@ -54,14 +66,17 @@ const Subjects = ({ data }: SubjectsProps) => {
 
   // Calculate total score across all quizzes
   const getTotalScore = () => {
+    // Compute total possible without localStorage so UI can show totals during SSR
+    const totalPossible = data.reduce((sum, q) => sum + q.questions.length, 0);
+
+    if (!isMounted || typeof window === "undefined") {
+      return { score: 0, total: totalPossible };
+    }
+
     const scores = JSON.parse(localStorage.getItem("quizScores") || "{}");
     let totalScore = 0;
-    let totalPossible = 0;
 
-    // Calculate total possible score from all quizzes
     data.forEach((quiz) => {
-      totalPossible += quiz.questions.length;
-
       // Add best score if quiz was played
       const quizScores = scores[quiz.title] || [];
       if (quizScores.length > 0) {
