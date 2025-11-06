@@ -34,21 +34,28 @@ const Answers = ({
     startTimeRef.current = performance.now();
   }, [questionId, data]);
 
+  // Watch questions store and call onCompleteQuestions when all answered.
+  useEffect(() => {
+    if (questions.length > 0 && questions.every((q) => q.userSelectedAnswer != null)) {
+      onCompleteQuestions();
+    }
+  }, [questions, onCompleteQuestions]);
+
   const handleSelectAnswer = (answer: string) => {
     if (selectedAns) return; // Prevent changing answer after selection
     const timeTakenMs = Math.max(0, performance.now() - startTimeRef.current);
     setSelectedAns(answer);
     handleAnswer(questionId, answer, timeTakenMs); // pass time to handler
 
-    // Auto advance to next question after a delay
+    // Auto advance to next question after a delay (only if there is a next question)
     setTimeout(() => {
-      if (questions.every((q) => q.userSelectedAnswer != null)) {
-        onCompleteQuestions();
-      } else {
+      const currentIndex = questions.findIndex((q) => q.id === questionId);
+      if (currentIndex >= 0 && currentIndex < questions.length - 1) {
         goNextQuestion();
         setSelectedAns("");
         startTimeRef.current = performance.now(); // reset for next question
       }
+      // don't call onCompleteQuestions here — use the effect above so it runs after store updates
     }, 1500); // 1.5 second delay before moving to next question
   };
 

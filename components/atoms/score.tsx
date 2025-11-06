@@ -14,10 +14,15 @@ const Score = () => {
 
       // Update scores for this quiz
       const quizScores = existingScores[selectedQuizz.title] || [];
+
+      // get player name from localStorage (added) — fallback to "Unknown"
+      const playerName = localStorage.getItem("playerName") || "Unknown";
+
       quizScores.push({
         score: score,
         total: selectedQuizz.questions.length,
         date: new Date().toISOString(),
+        name: playerName, // added player name
       });
 
       // Save back to localStorage
@@ -33,6 +38,7 @@ const Score = () => {
     score: number;
     total?: number;
     date?: string;
+    name?: string;
   }[];
   const scores = quizScores.map((s) => s.score);
 

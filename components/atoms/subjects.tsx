@@ -4,6 +4,7 @@ import { useQuestionStore } from "@/store/quiz-store";
 import Image from "next/image";
 import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
+import Link from "next/link";
 
 type SubjectsProps = {
   data: Quizz[];
@@ -178,6 +179,7 @@ const Subjects = ({ data }: SubjectsProps) => {
           </p>
         </div>
       )}
+      <p className="mt-4 text-center underline text-perameri dark:text-jakala"><Link href="/tulokset">Hall of Fame</Link></p>
     </div>
   );
 };
