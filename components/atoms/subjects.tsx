@@ -149,7 +149,7 @@ const Subjects = ({ data }: SubjectsProps) => {
             <div className="flex items-center justify-between gap-x-2 w-full">
               <p
                 className={cn(
-                  "text-yotaivas dark:text-valkoinen text-lg lg:text-xl font-semibold",
+                  "text-yotaivas dark:text-valkoinen text-md lg:text-lg font-semibold",
                   isPlayed && "opacity-75"
                 )}
               >
@@ -167,12 +167,12 @@ const Subjects = ({ data }: SubjectsProps) => {
       {/* Total score display */}
       {totalScore.total > 0 && (
         <div className="mt-6 p-4 bg-valkoinen dark:bg-perameri rounded-xl text-center">
-          <p className="text-yotaivas dark:text-valkoinen text-lg font-semibold">
+          <p className="text-yotaivas dark:text-valkoinen text-md lg:text-lg font-semibold">
             Kokonaispisteesi: {totalScore.score}/{totalScore.total}
           </p>
         </div>
       )}
-      <p className="mt-4 text-center underline text-perameri dark:text-jakala"><Link href="/tulokset">Hall of Fame</Link></p>
+      <p className="mt-4 text-center underline text-perameri dark:text-jakala"><Link href="/tulokset">Hall of Fame — Oulu2026-pikkujouluvisa</Link></p>
     </div>
   );
 };
