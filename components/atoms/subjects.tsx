@@ -11,15 +11,8 @@ type SubjectsProps = {
 };
 
 const Subjects = ({ data }: SubjectsProps) => {
-  const subjects = data.map((q) => ({ title: q.title, icon: q.icon }));
+  const subjects = data.map((q) => ({ title: q.title, icon: q.icon, bgcolor: q.bgcolor }));
   const selectQuizz = useQuestionStore((state) => state.selectQuizz);
-
-  const backgroundColors: { [key: string]: string } = {
-    HTML: "#FFF1E9",
-    CSS: "#E0FDEF",
-    JavaScript: "#EBF0FF",
-    Accessibility: "#F6E7FF",
-  };
 
   // Player name handling
   const [playerName, setPlayerName] = useState<string | null>(null);
@@ -143,7 +136,7 @@ const Subjects = ({ data }: SubjectsProps) => {
           >
             <div
               className={cn("p-2 rounded-lg", isPlayed && "opacity-75")}
-              style={{ backgroundColor: backgroundColors[subject.title] }}
+              style={{ backgroundColor: subject.bgcolor }}
             >
               <Image
                 src={subject.icon}
@@ -156,7 +149,7 @@ const Subjects = ({ data }: SubjectsProps) => {
             <div className="flex items-center justify-between gap-x-2 w-full">
               <p
                 className={cn(
-                  "text-yotaivas dark:text-valkoinen text-xl font-semibold",
+                  "text-yotaivas dark:text-valkoinen text-lg lg:text-xl font-semibold",
                   isPlayed && "opacity-75"
                 )}
               >
@@ -164,7 +157,7 @@ const Subjects = ({ data }: SubjectsProps) => {
               </p>
               {/* Always show score field — use '-' for unknown best */}
               <span className="text-sm text-yotaivas dark:text-valkoinen opacity-75">
-                Pisteesi: {isPlayed ? `${score.best}/${score.total}` : `-/${score.total}`}
+                Pisteesi:<br/>{isPlayed ? `${score.best}/${score.total}` : `-/${score.total}`}
               </span>
             </div>
           </button>
@@ -174,7 +167,7 @@ const Subjects = ({ data }: SubjectsProps) => {
       {/* Total score display */}
       {totalScore.total > 0 && (
         <div className="mt-6 p-4 bg-valkoinen dark:bg-perameri rounded-xl text-center">
-          <p className="text-yotaivas dark:text-valkoinen text-xl font-semibold">
+          <p className="text-yotaivas dark:text-valkoinen text-lg font-semibold">
             Kokonaispisteesi: {totalScore.score}/{totalScore.total}
           </p>
         </div>
