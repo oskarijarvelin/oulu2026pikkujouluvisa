@@ -41,9 +41,6 @@ export default function Home() {
             <h1 className="xs:text-3xl md:text-4xl xl:text-4xl 2xl:text-5xl font-normal text-yotaivas dark:text-valkoinen">
               <span className="xs:text-lg md:text-xl xl:text-2xl 2xl:text-3xl">Tervetuloa pelaamaan Oulu2026-</span> <span className="font-bold my-1 uppercase">pikkujouluvisaa</span>
             </h1>
-            <p className="text-perameri dark:text-jakala">
-              <Link href="/qr">Näytä QR-koodi &rarr;</Link>
-            </p>
           </MotionDiv>
           <MotionDiv
             initial={{ opacity: 0, y: -20 }}

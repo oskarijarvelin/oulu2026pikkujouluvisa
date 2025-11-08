@@ -22,7 +22,6 @@ export default function Qr() {
           <Link href="/">&larr; Takaisin visailemaan</Link>
         </p>
         
-
         <Image
             src="/assets/images/qr.png"
             alt="QR-linkki"

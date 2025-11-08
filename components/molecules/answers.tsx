@@ -107,7 +107,7 @@ const Answers = ({
     <>
       {/* progress bar visualizing 1.5s wait after answering */}
       <div className="w-full mt-4">
-        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
+        <div className="h-2 bg-valkoinen dark:bg-yotaivas rounded overflow-hidden">
           <div
             aria-hidden
             className={cn(

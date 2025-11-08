@@ -15,7 +15,7 @@ type LeaderboardRow = {
   perQuiz: Record<string, number>;
 };
 
-export default function Home() {
+export default function Tulokset() {
   const { fetchQuizzes, quizzes, selectedQuizz, hasCompleteAll, reset } =
     useQuestionStore();
 
@@ -117,8 +117,8 @@ export default function Home() {
                 typeof r.playedCount === "number"
                   ? r.playedCount
                   : r.perQuiz
-                  ? Object.keys(r.perQuiz).length
-                  : 0,
+                    ? Object.keys(r.perQuiz).length
+                    : 0,
               perQuiz: r.perQuiz || {},
             });
           });
@@ -141,8 +141,8 @@ export default function Home() {
                   typeof r.playedCount === "number"
                     ? r.playedCount
                     : r.perQuiz
-                    ? Object.keys(r.perQuiz).length
-                    : 0,
+                      ? Object.keys(r.perQuiz).length
+                      : 0,
                 perQuiz: r.perQuiz || {},
               });
             } else if (r && typeof r === "object") {
@@ -224,9 +224,9 @@ export default function Home() {
               ja palaile tänne!
             </div>
           ) : (
-            <div className="rounded-xl bg-valkoinen dark:bg-perameri p-4">
+            <div className="rounded-xl bg-harmaa/50 dark:bg-perameri p-4">
               <div className="overflow-x-auto">
-                <table className="min-w-full text-sm divide-y divide-gray-200 dark:divide-gray-700">
+                <table className="min-w-full text-sm divide-y divide-yotaivas/30 dark:divide-yotaivas">
                   <thead>
                     <tr>
                       <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-jakala">
@@ -243,7 +243,7 @@ export default function Home() {
                       </th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y divide-gray-100 dark:divide-gray-800">
+                  <tbody className="divide-y divide-harmaa dark:divide-yotaivas/50">
                     {leaderboard.map((row, i) => {
                       const isCurrent = playerName && row.name === playerName;
                       const percent =
@@ -261,7 +261,27 @@ export default function Home() {
                               : "text-yotaivas dark:text-jakala"
                           )}
                         >
-                          <td className="py-3 px-3">{i + 1}</td>
+                          <td className="py-3 px-3">
+                            {i === 0 && (
+                              <span role="img" aria-label="Gold medal">
+                                🥇
+                              </span>
+                            )}
+                            {i === 1 && (
+                              <span role="img" aria-label="Silver medal">
+                                🥈
+                              </span>
+                            )}
+                            {i === 2 && (
+                              <span role="img" aria-label="Bronze medal">
+                                🥉
+                              </span>
+                            )}
+                            {i > 2 && (
+                              i + 1
+                            )}
+
+                          </td>
                           <td className="py-3 px-3">
                             <div className="flex items-center gap-2">
                               <span className="font-medium">{row.name}</span>

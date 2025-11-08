@@ -128,9 +128,9 @@ const Subjects = ({ data }: SubjectsProps) => {
             }}
             disabled={isPlayed}
             className={cn(
-              "flex items-center gap-x-4 bg-valkoinen dark:bg-perameri py-3 px-4 xl:py-5 rounded-2xl shadow-lg ring-1 transition-all",
+              "flex items-center gap-x-4 bg-valkoinen dark:bg-perameri py-3 px-4 xl:py-5 rounded-2xl shadow-lg ring-1 ring-perameri/30 dark:ring-valkoinen transition-all",
               isPlayed
-                ? "opacity-50 cursor-not-allowed ring-harmaa hover:ring-harmaa"
+                ? "opacity-50 cursor-not-allowed ring-harmaa hover:ring-harmaa dark:ring-harmaa/50"
                 : "hover:ring-perameri"
             )}
           >
@@ -166,13 +166,15 @@ const Subjects = ({ data }: SubjectsProps) => {
 
       {/* Total score display */}
       {totalScore.total > 0 && (
-        <div className="mt-6 p-4 bg-valkoinen dark:bg-perameri rounded-xl text-center">
-          <p className="text-yotaivas dark:text-valkoinen text-md lg:text-lg font-semibold">
+        <div className="mt-6 p-4 bg-perameri rounded-xl text-center">
+          <p className="text-valkoinen text-md lg:text-lg font-semibold">
             Kokonaispisteesi: {totalScore.score}/{totalScore.total}
           </p>
         </div>
       )}
-      <p className="mt-4 text-center underline text-perameri dark:text-jakala"><Link href="/tulokset">Hall of Fame — Oulu2026-pikkujouluvisa &rarr;</Link></p>
+      <div>
+        <p className="mt-4 text-center underline text-perameri dark:text-jakala"><Link href="/tulokset">Hall of Fame &rarr;</Link></p>
+      </div>
     </div>
   );
 };

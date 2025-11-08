@@ -1,6 +1,5 @@
 import { cn } from "@/lib/utils";
-import Image from "next/image";
-import { useEffect, useRef } from "react";
+import { CircleCheck, CircleX } from "lucide-react";
 
 type AnswerProps = {
   answer: string;
@@ -32,9 +31,9 @@ const Answer = ({
           // when an answer is already selected, disable hover/group-hover styles
           !selectedAns &&
             // apply hover/group-hover only on lg and up
-            "w-full flex items-center gap-x-4 group bg-valkoinen dark:bg-jakala py-4 px-5 rounded-xl shadow-lg transition-all font-semibold text-sm text-yotaivas lg:hover:text-perameri",
+            "w-full flex items-center gap-x-4 group bg-valkoinen dark:bg-jakala py-4 px-5 rounded-xl shadow-lg transition-all font-semibold text-sm text-yotaivas lg:hover:text-perameri ring-1 ring-harmaa dark:ring-jakala",
           selectedAns &&
-            "w-full flex items-center gap-x-4 bg-valkoinen dark:bg-jakala py-4 px-5 rounded-xl shadow-lg transition-all font-semibold text-sm text-yotaivas",
+            "w-full flex items-center gap-x-4 bg-valkoinen dark:bg-jakala py-4 px-5 rounded-xl shadow-lg transition-all font-semibold text-sm text-yotaivas ring-1 ring-harmaa",
           isCorrectUserAnswer === false && selectedAns === answer && "ring-puolukka"
         )}
       >
@@ -42,10 +41,10 @@ const Answer = ({
           className={cn(
             selectedAns === answer
               ? "bg-perameri text-valkoinen"
-              : "bg-harmaa dark:bg-yotaivas dark:text-jakala",
+              : "bg-valkoinen dark:bg-yotaivas dark:text-jakala",
             // only apply group-hover classes on lg+ so mobile doesn't get hover effects
             !selectedAns &&
-              "lg:group-hover:text-perameri lg:dark:group-hover:text-valkoinen lg:group-hover:bg-harmaa lg:dark:group-hover:bg-yotaivas transition-all",
+              "lg:group-hover:text-valkoinen lg:dark:group-hover:text-valkoinen lg:group-hover:bg-perameri lg:dark:group-hover:bg-perameri transition-all ring-1 ring-harmaa dark:ring-jakala",
             "text-lg rounded-lg py-2 px-4",
             isCorrectUserAnswer === false && selectedAns === answer && "bg-puolukka",
             isCorrectUserAnswer && selectedAns === answer && "bg-metsa"
@@ -53,25 +52,15 @@ const Answer = ({
         >
           {answerLabels[index]}
         </span>
-        <span className="xl:text-lg">{answer}</span>
+        <span className="xl:text-lg text-left">{answer}</span>
         {isCorrectUserAnswer && selectedAns === answer && (
-          <span className="text-metsa ml-auto">
-            <Image
-              src="/assets/images/icon-correct.svg"
-              alt="check"
-              width={30}
-              height={30}
-            />
+          <span className="ml-auto">
+            <CircleCheck color="#14502E" />
           </span>
         )}
         {isCorrectUserAnswer === false && selectedAns === answer && (
-          <span className="text-puolukka ml-auto">
-            <Image
-              src="/assets/images/icon-error.svg"
-              alt="cross"
-              width={30}
-              height={30}
-            />
+          <span className="ml-auto">
+            <CircleX color="#F1334B" />
           </span>
         )}
       </button>

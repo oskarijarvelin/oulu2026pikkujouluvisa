@@ -1,23 +1,27 @@
 "use client";
 import SwitchTheme from "../atoms/switch-theme";
+import { useThemeStore } from "@/store/theme-store";
 import { useQuestionStore } from "@/store/quiz-store";
 import { backgroundColors, cn } from "@/lib/utils";
 import Image from "next/image";
+import Link from "next/link";
 import { MotionHeader } from "../animated/motion-header";
+import { QrCode } from "lucide-react";
+
+
 
 const Header = () => {
   const selectedQuizz = useQuestionStore((state) => state.selectedQuizz);
+  const { darkMode } = useThemeStore();
+  
   return (
     <MotionHeader
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0}}
-    transition={{ delay: 0.5}}	
-      className={cn(
-        selectedQuizz ? "flex justify-between w-full items-center" : "",
-        "relative z-10"
-      )}
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.5 }}
+      className="flex justify-between w-full items-center relative z-10"
     >
-      {selectedQuizz && (
+      {selectedQuizz ? (
         <div className="flex gap-x-4 items-center sm:px-6 sm:py-4">
           {" "}
           <div
@@ -36,6 +40,10 @@ const Header = () => {
             {selectedQuizz.title}
           </p>
         </div>
+      ) : (
+        <Link href="/qr">
+          <QrCode color={darkMode ? "#FFF" : "#666"} />
+        </Link>
       )}
       <SwitchTheme />
     </MotionHeader>
