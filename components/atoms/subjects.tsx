@@ -172,7 +172,7 @@ const Subjects = ({ data }: SubjectsProps) => {
           </p>
         </div>
       )}
-      <p className="mt-4 text-center underline text-perameri dark:text-jakala"><Link href="/tulokset">Hall of Fame — Oulu2026-pikkujouluvisa</Link></p>
+      <p className="mt-4 text-center underline text-perameri dark:text-jakala"><Link href="/tulokset">Hall of Fame — Oulu2026-pikkujouluvisa &rarr;</Link></p>
     </div>
   );
 };

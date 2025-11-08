@@ -2,6 +2,7 @@
 import { useQuestionStore } from "@/store/quiz-store";
 import { useState, useRef, useEffect } from "react";
 import Answer from "../atoms/answer";
+import { cn } from "@/lib/utils"; // added
 
 type AnswersProps = {
   data: string[];
@@ -27,6 +28,8 @@ const Answers = ({
   goNextQuestion,
 }: AnswersProps) => {
   const [selectedAns, setSelectedAns] = useState("");
+  const [isWaiting, setIsWaiting] = useState(false);
+  const waitTimeoutRef = useRef<number | null>(null);
   const { questions, onCompleteQuestions } = useQuestionStore();
   const isCorrectUserAnswer = questions.find(
     (q) => q.id === questionId
@@ -68,20 +71,63 @@ const Answers = ({
     setSelectedAns(answer);
     handleAnswer(questionId, answer, timeTakenMs); // pass time to handler
 
+    // start visual wait
+    setIsWaiting(true);
+    // clear any previous timeout
+    if (waitTimeoutRef.current) {
+      window.clearTimeout(waitTimeoutRef.current);
+    }
+
     // Auto advance to next question after a delay (only if there is a next question)
-    setTimeout(() => {
+    waitTimeoutRef.current = window.setTimeout(() => {
       const currentIndex = questions.findIndex((q) => q.id === questionId);
       if (currentIndex >= 0 && currentIndex < questions.length - 1) {
         goNextQuestion();
         setSelectedAns("");
         startTimeRef.current = performance.now(); // reset for next question
       }
+      // stop visual wait
+      setIsWaiting(false);
+      waitTimeoutRef.current = null;
       // don't call onCompleteQuestions here — use the effect above so it runs after store updates
     }, 1500); // 1.5 second delay before moving to next question
   };
 
+  // clear timeout when question changes / component unmounts
+  useEffect(() => {
+    return () => {
+      if (waitTimeoutRef.current) {
+        window.clearTimeout(waitTimeoutRef.current);
+        waitTimeoutRef.current = null;
+      }
+    };
+  }, [questionId]);
+
   return (
     <>
+      {/* progress bar visualizing 1.5s wait after answering */}
+      <div className="w-full mt-4">
+        <div className="h-2 bg-gray-200 dark:bg-gray-700 rounded overflow-hidden">
+          <div
+            aria-hidden
+            className={cn(
+              "h-full",
+              // choose color only when an answer was selected (selectedAns)
+              selectedAns
+                ? isCorrectUserAnswer === true
+                  ? "bg-metsa"
+                  : isCorrectUserAnswer === false
+                  ? "bg-puolukka"
+                  : "bg-perameri"
+                : "bg-perameri"
+            )}
+            style={{
+              width: isWaiting ? "100%" : "0%",
+              transition: "width 1500ms linear",
+            }}
+          />
+        </div>
+      </div>
       <ul className="flex flex-col gap-y-4 justify-center w-full">
         {shuffledAnswers.map((answer, index) => (
           <Answer
