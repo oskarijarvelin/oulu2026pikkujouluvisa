@@ -22,13 +22,43 @@ const Answer = ({
 
   // Clear focus when selectedAns is cleared (e.g. on question change)
   useEffect(() => {
-    if (!selectedAns && buttonRef.current) {
-      // If the currently focused element is inside this button, blur it.
+    if (!selectedAns) {
+      // Blur whatever is currently focused first
       const active = document.activeElement as HTMLElement | null;
-      if (active && buttonRef.current.contains(active)) {
-        active.blur();
-      } else {
-        buttonRef.current.blur();
+      if (active) {
+        try {
+          active.blur();
+        } catch (e) {
+          /* ignore */
+        }
+      }
+
+      // On some mobile browsers blurring alone doesn't dismiss the virtual keyboard.
+      // Create a temporary off-screen focus sink, focus+blur it to force keyboard to hide,
+      // then remove it immediately.
+      try {
+        const sink = document.createElement("input");
+        sink.setAttribute("aria-hidden", "true");
+        sink.style.position = "fixed";
+        sink.style.opacity = "0";
+        sink.style.height = "0";
+        sink.style.width = "0";
+        sink.style.left = "-9999px";
+        // must be focusable
+        sink.tabIndex = 0;
+        document.body.appendChild(sink);
+        sink.focus();
+        sink.blur();
+        document.body.removeChild(sink);
+      } catch (e) {
+        // fallback: blur the button ref if available
+        if (buttonRef.current) {
+          try {
+            buttonRef.current.blur();
+          } catch (err) {
+            /* ignore */
+          }
+        }
       }
     }
   }, [selectedAns]);
