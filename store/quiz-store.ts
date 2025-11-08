@@ -23,6 +23,77 @@ const API_URL =
     ? "https://oulu2026pikkujouluvisa.vercel.app/"
     : "http://localhost:3000/";
 
+// helper: Fisher-Yates shuffle
+function shuffle<T>(arr: T[]) {
+  const a = arr.slice();
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// localStorage keys: order:{playerKey}:{quizTitle}
+function makeOrderKey(playerKey: string, quizTitle: string) {
+  return `order:${playerKey}:${quizTitle}`;
+}
+
+function getPlayerKey() {
+  if (typeof window === "undefined") return "guest";
+  return (localStorage.getItem("playerName") || "guest").replace(/\s+/g, "_");
+}
+
+function loadOrderIds(playerKey: string, quizTitle: string): number[] | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = localStorage.getItem(makeOrderKey(playerKey, quizTitle));
+    if (!raw) return null;
+    const ids = JSON.parse(raw);
+    return Array.isArray(ids) ? ids : null;
+  } catch {
+    return null;
+  }
+}
+
+function saveOrderIds(playerKey: string, quizTitle: string, ids: number[]) {
+  if (typeof window === "undefined") return;
+  try {
+    localStorage.setItem(makeOrderKey(playerKey, quizTitle), JSON.stringify(ids));
+  } catch {
+    /* ignore */
+  }
+}
+
+/**
+ * Return questions in a persistent shuffled order for the current player.
+ * - if stored order exists and matches current question set, use it
+ * - otherwise shuffle once, persist order and return shuffled questions
+ */
+function getOrCreateShuffledQuestions<T extends { id: number }>(
+  quizTitle: string,
+  questions: T[]
+): T[] {
+  if (typeof window === "undefined") return questions.slice();
+
+  const playerKey = getPlayerKey();
+  const stored = loadOrderIds(playerKey, quizTitle);
+
+  // Build map of id -> question for quick lookup
+  const map = new Map<number, T>();
+  questions.forEach((q) => map.set(q.id, q));
+
+  if (stored && stored.length === questions.length && stored.every((id) => map.has(id))) {
+    // Re-order according to stored ids
+    return stored.map((id) => map.get(id)!) as T[];
+  }
+
+  // No valid stored order: shuffle and persist
+  const shuffled = shuffle(questions);
+  const ids = shuffled.map((q) => q.id);
+  saveOrderIds(playerKey, quizTitle, ids);
+  return shuffled;
+}
+
 export const useQuestionStore = create<State>()(
   persist(
     (set, get) => {
@@ -112,3 +183,6 @@ export const useQuestionStore = create<State>()(
     }
   )
 );
+
+// Example usage: where you currently set questions for a quiz, replace assignment with:
+// questions: getOrCreateShuffledQuestions(quizTitle, loadedQuestions)

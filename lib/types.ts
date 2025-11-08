@@ -10,5 +10,6 @@ export interface Question {
 export interface Quizz {
   title: string;
   icon: string;
+  bgcolor: string;
   questions: Question[];
 }

@@ -3,6 +3,7 @@
         {
             "title": "HTML",
             "icon": "./assets/images/icon-html.svg",
+            "bgcolor": "#FFF1E9",
             "questions": [
                 {
                     "id": 1,
@@ -119,6 +120,7 @@
         {
             "title": "CSS",
             "icon": "./assets/images/icon-css.svg",
+            "bgcolor": "#E0FDEF",
             "questions": [
                 {
                     "id": 1,
@@ -235,6 +237,7 @@
         {
             "title": "JavaScript",
             "icon": "./assets/images/icon-js.svg",
+            "bgcolor": "#EBF0FF",
             "questions": [
                 {
                     "id": 1,
@@ -351,6 +354,7 @@
         {
             "title": "Accessibility",
             "icon": "./assets/images/icon-accessibility.svg",
+            "bgcolor": "#F6E7FF",
             "questions": [
                 {
                     "id": 1,
