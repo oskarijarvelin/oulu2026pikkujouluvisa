@@ -20,12 +20,20 @@ const Answer = ({
   return (
     <li>
       <button
-        onClick={() => handleSelectAnswer(answer)}
+        onClick={(e) => {
+          handleSelectAnswer(answer);
+          // remove focus so focus styles don't persist
+          (e.currentTarget as HTMLButtonElement).blur();
+        }}
         className={cn(
           selectedAns === answer && "ring-perameri ring-1",
           isCorrectUserAnswer && selectedAns === answer && "ring-green",
 
-          "w-full flex items-center gap-x-4 group bg-valkoinen dark:bg-jakala py-4 px-5 rounded-xl shadow-lg transition-all font-semibold text-sm text-yotaivas hover:text-perameri",
+          // when an answer is already selected, disable hover/group-hover styles
+          !selectedAns &&
+            "w-full flex items-center gap-x-4 group bg-valkoinen dark:bg-jakala py-4 px-5 rounded-xl shadow-lg transition-all font-semibold text-sm text-yotaivas hover:text-perameri",
+          selectedAns &&
+            "w-full flex items-center gap-x-4 bg-valkoinen dark:bg-jakala py-4 px-5 rounded-xl shadow-lg transition-all font-semibold text-sm text-yotaivas",
           isCorrectUserAnswer === false && selectedAns === answer && "ring-puolukka"
         )}
       >
@@ -33,8 +41,11 @@ const Answer = ({
           className={cn(
             selectedAns === answer
               ? "bg-perameri text-valkoinen"
-              : "bg-harmaa dark:bg-yotaivas dark:text-jakala group-hover:text-perameri dark:group-hover:text-valkoinen group-hover:bg-harmaa dark:group-hover:bg-yotaivas transition-all",
-            "text-lg rounded-lg py-2 px-4  ",
+              : "bg-harmaa dark:bg-yotaivas dark:text-jakala",
+            // only apply group-hover classes when no answer has been selected yet
+            !selectedAns &&
+              "group-hover:text-perameri dark:group-hover:text-valkoinen group-hover:bg-harmaa dark:group-hover:bg-yotaivas transition-all",
+            "text-lg rounded-lg py-2 px-4",
             isCorrectUserAnswer === false && selectedAns === answer && "bg-puolukka",
             isCorrectUserAnswer && selectedAns === answer && "bg-metsa"
           )}

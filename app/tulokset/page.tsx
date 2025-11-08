@@ -1,9 +1,6 @@
 "use client";
-import Game from "@/components/molecules/game";
 import MaxWidthWrapper from "@/components/atoms/max-width-wrapper";
 import Link from "next/link";
-import Score from "@/components/atoms/score";
-import Subjects from "@/components/atoms/subjects";
 import { useQuestionStore } from "@/store/quiz-store";
 import { useEffect, useState } from "react";
 import { MotionDiv } from "@/components/animated/motion-div";
@@ -242,7 +239,7 @@ export default function Home() {
                         Pisteet
                       </th>
                       <th className="text-left py-2 px-3 font-medium text-yotaivas dark:text-jakala">
-                        Edistyminen
+                        Pelattu
                       </th>
                     </tr>
                   </thead>
