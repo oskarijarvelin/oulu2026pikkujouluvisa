@@ -3,6 +3,8 @@ import { backgroundColors } from "@/lib/utils";
 import { useQuestionStore } from "@/store/quiz-store";
 import Image from "next/image";
 import { useEffect } from "react";
+import { initFirebase } from "@/lib/firebase";
+import { getDatabase, ref, runTransaction } from "firebase/database";
 
 const Score = () => {
   const { selectedQuizz, score } = useQuestionStore();
@@ -28,6 +30,41 @@ const Score = () => {
       // Save back to localStorage
       existingScores[selectedQuizz.title] = quizScores;
       localStorage.setItem("quizScores", JSON.stringify(existingScores));
+
+      // Try to update Firebase Realtime Database leaderboard
+      try {
+        initFirebase();
+        const db = getDatabase();
+        // Use a safe key for the player (encode to avoid illegal path chars)
+        const playerKey = encodeURIComponent(playerName);
+        const playerRef = ref(db, `leaderboard/${playerKey}`);
+
+        // Transaction: merge perQuiz best score, recompute total and playedCount
+        runTransaction(playerRef, (current) => {
+          const perQuiz = (current && current.perQuiz) ? { ...current.perQuiz } : {};
+          const prev = typeof perQuiz[selectedQuizz.title] === "number" ? perQuiz[selectedQuizz.title] : 0;
+          perQuiz[selectedQuizz.title] = Math.max(prev, score);
+
+          const total = Object.values(perQuiz).reduce(
+            (s: number, v: unknown) => s + (typeof v === "number" ? v : 0),
+            0
+          );
+          const playedCount = Object.keys(perQuiz).length;
+
+          return {
+            name: playerName,
+            perQuiz,
+            total,
+            playedCount,
+            updatedAt: new Date().toISOString(),
+          };
+        }).catch((err) => {
+          console.error("Failed to update Firebase leaderboard:", err);
+        });
+      } catch (e) {
+        // Firebase not configured or init failed — ignore, localStorage already saved
+        // console.warn("Firebase init failed, skipping leaderboard update");
+      }
     }
   }, [selectedQuizz, score]);
 
