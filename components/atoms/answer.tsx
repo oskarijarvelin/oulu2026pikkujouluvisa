@@ -1,5 +1,6 @@
 import { cn } from "@/lib/utils";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 
 type AnswerProps = {
   answer: string;
@@ -17,9 +18,25 @@ const Answer = ({
   index,
   answerLabels,
 }: AnswerProps) => {
+  const buttonRef = useRef<HTMLButtonElement | null>(null);
+
+  // Clear focus when selectedAns is cleared (e.g. on question change)
+  useEffect(() => {
+    if (!selectedAns && buttonRef.current) {
+      // If the currently focused element is inside this button, blur it.
+      const active = document.activeElement as HTMLElement | null;
+      if (active && buttonRef.current.contains(active)) {
+        active.blur();
+      } else {
+        buttonRef.current.blur();
+      }
+    }
+  }, [selectedAns]);
+
   return (
     <li>
       <button
+        ref={buttonRef}
         onClick={(e) => {
           handleSelectAnswer(answer);
           // remove focus so focus styles don't persist
