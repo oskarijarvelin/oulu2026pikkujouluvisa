@@ -46,6 +46,8 @@ const Answers = ({
   }, [questionId, data]);
 
   // Watch questions store and call onCompleteQuestions when all answered.
+  // Removed immediate completion here — completion is handled after the 1.5s wait
+  // inside handleSelectAnswer so the same visual wait is used for the last question.
   useEffect(() => {
     if (questions.length > 0 && questions.every((q) => q.userSelectedAnswer != null)) {
       onCompleteQuestions();
@@ -82,15 +84,22 @@ const Answers = ({
     waitTimeoutRef.current = window.setTimeout(() => {
       const currentIndex = questions.findIndex((q) => q.id === questionId);
       if (currentIndex >= 0 && currentIndex < questions.length - 1) {
+        // not the last question -> advance
         goNextQuestion();
         setSelectedAns("");
         startTimeRef.current = performance.now(); // reset for next question
+        setIsWaiting(false);
+      } else {
+        // last question -> keep the same 1.5s wait visual, then complete quiz
+        try {
+          onCompleteQuestions();
+        } catch (e) {
+          /* ignore */
+        }
+        setIsWaiting(false);
       }
-      // stop visual wait
-      setIsWaiting(false);
       waitTimeoutRef.current = null;
-      // don't call onCompleteQuestions here — use the effect above so it runs after store updates
-    }, 1500); // 1.5 second delay before moving to next question
+    }, 1500); // 1.5 second delay before moving to next question / showing score
   };
 
   // clear timeout when question changes / component unmounts
