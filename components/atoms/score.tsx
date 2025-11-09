@@ -80,23 +80,24 @@ const Score = () => {
   const scores = quizScores.map((s) => s.score);
 
   // Determine which icon to use
-  const useLucideIcon = selectedQuizz.options?.icon;
-  const LucideIconComponent = useLucideIcon ? getLucideIcon(useLucideIcon) : null;
   const iconColor = selectedQuizz.options?.iconColor || "#000000";
-  const iconBgColor = selectedQuizz.options?.iconBgColor || backgroundColors[selectedQuizz.title] || selectedQuizz.bgcolor;
+  const iconBgColor = selectedQuizz.options?.iconBgColor || backgroundColors[selectedQuizz.title] || "#FFFFFF";
+
+  function formatPoints(value: number) {
+    if (!Number.isFinite(value)) return String(value);
+    // show integer if no fractional part, otherwise one decimal
+    return Number.isInteger(value) ? String(value) : value.toFixed(1);
+  }
 
   return (
     <div className="flex flex-col gap-4 bg-[#fff] dark:bg-slate p-10 rounded-xl">
       <div className="flex gap-x-2 items-center justify-center">
         <div
-          className="xs:p-1 p-2 rounded-lg"
-          style={{ backgroundColor: iconBgColor }}
+          className="w-10 h-10 flex items-center justify-center rounded-lg text-lg font-bold select-none"
+          style={{ backgroundColor: iconBgColor, color: iconColor }}
+          aria-hidden
         >
-          {LucideIconComponent ? (
-            <LucideIconComponent size={30} color={iconColor} strokeWidth={2} />
-          ) : (
-            <Image src={selectedQuizz.icon} alt="arrow" width={30} height={30} />
-          )}
+          {selectedQuizz.title?.charAt(0).toUpperCase() || "?"}
         </div>
         <p className="text-dark-blue dark:text-white font-bold xs:text-xl md:text-2xl">
           {selectedQuizz.title}
@@ -104,7 +105,7 @@ const Score = () => {
       </div>
       <div className="flex flex-col justify-center items-center gap-4">
         <p className="text-dark-blue dark:text-white my-10 font-bold xs:text-5xl sm:text-5xl lg:text-9xl">
-          {score.toFixed(1)}/{selectedQuizz.questions.length}
+          {formatPoints(score)}/{selectedQuizz.questions.length}
         </p>
       </div>
     </div>

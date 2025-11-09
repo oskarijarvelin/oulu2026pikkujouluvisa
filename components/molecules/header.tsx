@@ -6,13 +6,27 @@ import { backgroundColors, cn } from "@/lib/utils";
 import Image from "next/image";
 import Link from "next/link";
 import { MotionHeader } from "../animated/motion-header";
-import { QrCode } from "lucide-react";
+import { QrCode, Settings2 } from "lucide-react";
+import { useEffect, useState } from "react";
 
 
 
 const Header = () => {
   const selectedQuizz = useQuestionStore((state) => state.selectedQuizz);
   const { darkMode } = useThemeStore();
+  const [isLocal, setIsLocal] = useState(false);
+  useEffect(() => {
+    // Show admin link only in local development (localhost / 127.0.0.1) or when NODE_ENV=development
+    const isDevEnv = process.env.NODE_ENV === "development";
+    const isHostLocal =
+      typeof window !== "undefined" &&
+      (window.location.hostname === "localhost" || window.location.hostname === "127.0.0.1");
+    setIsLocal(isDevEnv || isHostLocal);
+  }, []);
+  // use colors from quiz data (data.json / firebase) with sensible fallbacks
+  const iconBgColor =
+    selectedQuizz?.options?.iconBgColor ?? backgroundColors[selectedQuizz?.title ?? ""] ?? "#000";
+  const iconColor = selectedQuizz?.options?.iconColor ?? "#fff";
   
   return (
     <MotionHeader
@@ -25,25 +39,28 @@ const Header = () => {
         <div className="flex gap-x-4 items-center sm:px-6 sm:py-4">
           {" "}
           <div
-            className="xs:p-1 p-2 rounded-lg"
-            style={{ backgroundColor: backgroundColors[selectedQuizz.title] }}
-          >
-            <Image
-              src={selectedQuizz.icon}
-              alt="Icon"
-              width={30}
-              height={30}
-              className="xs:size-5 xl:size-10"
-            />
+              className="w-10 h-10 flex items-center justify-center rounded-lg text-lg font-bold select-none"
+              style={{ backgroundColor: iconBgColor, color: iconColor }}
+              aria-hidden
+            >
+              {selectedQuizz.title?.charAt(0).toUpperCase() || "?"}
           </div>
           <p className="text-dark-blue dark:text-white font-bold xs:text-lg sm:text-xl xl:text-3xl">
             {selectedQuizz.title}
           </p>
         </div>
       ) : (
-        <Link href="/qr">
-          <QrCode color={darkMode ? "#FFF" : "#666"} />
-        </Link>
+        <div className="flex gap-x-4 items-center sm:px-6 sm:py-4">
+          <Link href="/qr">
+            <QrCode color={darkMode ? "#FFF" : "#666"} />
+          </Link>
+          {isLocal && (
+            <Link href="/admin">
+              <span className="sr-only">Admin</span>
+              <Settings2 color={darkMode ? "#FFF" : "#666"} />
+            </Link>
+          )}
+        </div>
       )}
       <SwitchTheme />
     </MotionHeader>

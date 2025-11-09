@@ -30,7 +30,7 @@ const Answers = ({
   const [selectedAns, setSelectedAns] = useState("");
   const [isWaiting, setIsWaiting] = useState(false);
   const waitTimeoutRef = useRef<number | null>(null);
-  const { questions, onCompleteQuestions } = useQuestionStore();
+  const { questions, onCompleteQuestions, selectedQuizz } = useQuestionStore();
   const currentQuestion = questions.find((q) => q.id === questionId);
   const isCorrectUserAnswer = currentQuestion?.isCorrectUserAnswer;
   const pointsEarned = currentQuestion?.pointsEarned;
@@ -119,6 +119,15 @@ const Answers = ({
     return total;
   }, 0);
 
+  // Determine maximum possible score for this quiz (fallback to question count)
+  const maxScore =
+    selectedQuizz?.questions?.length ?? (questions ? questions.length : 0);
+
+  function formatPoints(value: number) {
+    if (!Number.isFinite(value)) return String(value);
+    return Number.isInteger(value) ? String(value) : value.toFixed(1);
+  }
+  
   return (
     <>
       {/* progress bar visualizing 1.5s wait after answering */}
@@ -161,13 +170,17 @@ const Answers = ({
       {/* Score count display under the options */}
       <div className="mt-4 flex items-center justify-center gap-2 text-yotaivas dark:text-valkoinen">
         <span className="text-lg font-semibold">Pisteet yhteensä:</span>
-        <span className="text-2xl font-bold">{cumulativeScore.toFixed(1)}</span>
+        <span className="text-2xl font-bold">
+          {formatPoints(cumulativeScore)}/{maxScore}
+        </span>
         {selectedAns && pointsEarned !== undefined && (
-          <span className={cn(
-            "text-lg font-bold ml-2",
-            isCorrectUserAnswer ? "text-metsa" : "text-puolukka"
-          )}>
-            ({isCorrectUserAnswer ? '+' : ''}{pointsEarned.toFixed(1)}p)
+          <span
+            className={cn(
+              "text-lg font-bold ml-2",
+              isCorrectUserAnswer ? "text-metsa" : "text-puolukka"
+            )}
+          >
+            ({isCorrectUserAnswer ? "+" : ""}{formatPoints(pointsEarned)}p)
           </span>
         )}
       </div>
