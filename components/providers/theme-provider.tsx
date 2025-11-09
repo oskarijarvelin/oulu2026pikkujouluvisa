@@ -14,7 +14,7 @@ const ThemeProvider: React.FC<ThemeProviderProps> = ({ children }) => {
   return (
     <div className={cn(
       darkMode && "dark",
-      "xs:min-h-screen lg:h-full w-full lg:overflow-hidden transition-all",
+      "min-h-screen w-full transition-all",
     )}>
       {children}
     </div>
