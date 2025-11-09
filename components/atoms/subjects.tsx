@@ -6,6 +6,13 @@ import { cn } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
+const DECIMALS = 1;
+
+function formatPoints(value: number) {
+  if (!Number.isFinite(value)) return String(value);
+  return value.toFixed(DECIMALS);
+}
+
 type SubjectsProps = {
   data: Quizz[];
 };
@@ -168,7 +175,7 @@ const Subjects = ({ data }: SubjectsProps) => {
       {totalScore.total > 0 && (
         <div className="mt-6 p-4 bg-perameri rounded-xl text-center">
           <p className="text-valkoinen text-md lg:text-lg font-semibold">
-            Kokonaispisteesi: {totalScore.score}/{totalScore.total}
+            Kokonaispisteesi: {formatPoints(totalScore.score)}/{totalScore.total}
           </p>
         </div>
       )}
