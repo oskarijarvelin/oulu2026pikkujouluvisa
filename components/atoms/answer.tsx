@@ -8,6 +8,7 @@ type AnswerProps = {
   handleSelectAnswer: (answer: string) => void;
   index: number;
   answerLabels: string[];
+  pointsEarned?: number;
 };
 const Answer = ({
   answer,
@@ -16,6 +17,7 @@ const Answer = ({
   handleSelectAnswer,
   index,
   answerLabels,
+  pointsEarned,
 }: AnswerProps) => {
 
   return (
@@ -54,13 +56,23 @@ const Answer = ({
         </span>
         <span className="xl:text-lg text-left">{answer}</span>
         {isCorrectUserAnswer && selectedAns === answer && (
-          <span className="ml-auto">
+          <span className="ml-auto flex items-center gap-2">
             <CircleCheck color="#14502E" />
+            {pointsEarned !== undefined && (
+              <span className="text-metsa font-bold text-lg">
+                +{pointsEarned.toFixed(1)}p
+              </span>
+            )}
           </span>
         )}
         {isCorrectUserAnswer === false && selectedAns === answer && (
-          <span className="ml-auto">
+          <span className="ml-auto flex items-center gap-2">
             <CircleX color="#F1334B" />
+            {pointsEarned !== undefined && (
+              <span className="text-puolukka font-bold text-lg">
+                +{pointsEarned.toFixed(1)}p
+              </span>
+            )}
           </span>
         )}
       </button>

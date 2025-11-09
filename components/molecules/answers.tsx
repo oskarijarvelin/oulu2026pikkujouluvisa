@@ -31,9 +31,9 @@ const Answers = ({
   const [isWaiting, setIsWaiting] = useState(false);
   const waitTimeoutRef = useRef<number | null>(null);
   const { questions, onCompleteQuestions } = useQuestionStore();
-  const isCorrectUserAnswer = questions.find(
-    (q) => q.id === questionId
-  )?.isCorrectUserAnswer;
+  const currentQuestion = questions.find((q) => q.id === questionId);
+  const isCorrectUserAnswer = currentQuestion?.isCorrectUserAnswer;
+  const pointsEarned = currentQuestion?.pointsEarned;
 
   const answerLabels = ["A", "B", "C", "D"];
 
@@ -46,13 +46,12 @@ const Answers = ({
   }, [questionId, data]);
 
   // Watch questions store and call onCompleteQuestions when all answered.
-  // Removed immediate completion here — completion is handled after the 1.5s wait
-  // inside handleSelectAnswer so the same visual wait is used for the last question.
+  // Only complete if we're NOT currently waiting (to avoid racing with the 1.5s visual feedback)
   useEffect(() => {
-    if (questions.length > 0 && questions.every((q) => q.userSelectedAnswer != null)) {
+    if (!isWaiting && questions.length > 0 && questions.every((q) => q.userSelectedAnswer != null)) {
       onCompleteQuestions();
     }
-  }, [questions, onCompleteQuestions]);
+  }, [questions, onCompleteQuestions, isWaiting]);
 
   // Randomize order of answers once per question (when `questionId` changes)
   // keep shuffledAnswers in state so re-renders (e.g. selecting an answer)
@@ -147,6 +146,7 @@ const Answers = ({
             handleSelectAnswer={handleSelectAnswer}
             index={index}
             answerLabels={answerLabels}
+            pointsEarned={pointsEarned}
           />
         ))}
       </ul>
