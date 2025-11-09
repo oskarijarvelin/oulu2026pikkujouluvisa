@@ -1,6 +1,7 @@
 import { create } from "zustand";
 import { persist } from "zustand/middleware";
 import { Question, Quizz } from "@/lib/types";
+import { fetchQuizzesFromFirebase } from "@/lib/firebase-service";
 
 interface State {
   quizzes: Quizz[];
@@ -145,6 +146,18 @@ export const useQuestionStore = create<State>()(
         },
         fetchQuizzes: async () => {
           try {
+            // Try to fetch from Firebase first
+            try {
+              const quizzes = await fetchQuizzesFromFirebase();
+              if (quizzes && quizzes.length > 0) {
+                set({ quizzes, hasCompleteAll: false }, false);
+                return;
+              }
+            } catch (firebaseError) {
+              console.log("Firebase fetch failed, falling back to static file:", firebaseError);
+            }
+            
+            // Fallback to static JSON file
             const res = await fetch(`${API_URL}/data.json`);
             const json = await res.json();
             const quizzes = json.quizzes as Quizz[];

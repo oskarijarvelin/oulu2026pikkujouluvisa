@@ -1,4 +1,7 @@
-import { initializeApp, getApps } from "firebase/app";
+import { initializeApp, getApps, getApp } from "firebase/app";
+import { getDatabase, Database } from "firebase/database";
+
+let database: Database | null = null;
 
 export function initFirebase() {
   if (!getApps().length) {
@@ -14,4 +17,17 @@ export function initFirebase() {
       appId: process.env.NEXT_PUBLIC_FIREBASE_APP_ID,
     });
   }
+  
+  if (!database) {
+    database = getDatabase(getApp());
+  }
+  
+  return database;
+}
+
+export function getDb(): Database {
+  if (!database) {
+    database = initFirebase();
+  }
+  return database;
 }
