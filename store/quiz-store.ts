@@ -96,23 +96,35 @@ function getOrCreateShuffledQuestions<T extends { id: number }>(
 
 /**
  * Calculate points based on time taken to answer:
- * - <= 5000ms: 1.0 points (full points)
- * - >= 10000ms: 0.5 points (half points)
- * - Between 5000-10000ms: linear decrease with 0.1 point steps
+ * - If time-based scoring is disabled, return 1.0 for correct, 0 for incorrect
+ * - Otherwise use configurable thresholds:
+ *   - <= fullPointsThreshold: 1.0 points (full points)
+ *   - >= halfPointsThreshold: 0.5 points (half points)
+ *   - Between thresholds: linear decrease with 0.1 point steps
  */
-function calculatePointsFromTime(timeTakenMs: number, isCorrect: boolean): number {
+function calculatePointsFromTime(
+  timeTakenMs: number, 
+  isCorrect: boolean,
+  timeBasedScoring: boolean = true,
+  fullPointsThreshold: number = 5000,
+  halfPointsThreshold: number = 10000
+): number {
   if (!isCorrect) return 0;
   
-  const timeInSeconds = timeTakenMs / 1000;
-  
-  if (timeInSeconds <= 5) {
+  // If time-based scoring is disabled, always return 1.0 for correct answers
+  if (!timeBasedScoring) {
     return 1.0;
-  } else if (timeInSeconds >= 10) {
+  }
+  
+  if (timeTakenMs <= fullPointsThreshold) {
+    return 1.0;
+  } else if (timeTakenMs >= halfPointsThreshold) {
     return 0.5;
   } else {
-    // Linear interpolation between 5 and 10 seconds
-    // At 5s: 1.0, at 10s: 0.5, so slope is -0.1 per second
-    const points = 1.0 - ((timeInSeconds - 5) * 0.1);
+    // Linear interpolation between thresholds
+    const range = halfPointsThreshold - fullPointsThreshold;
+    const offset = timeTakenMs - fullPointsThreshold;
+    const points = 1.0 - ((offset / range) * 0.5);
     // Round to nearest 0.1 to ensure clean 0.1 point decreases
     return Math.round(points * 10) / 10;
   }
@@ -143,7 +155,7 @@ export const useQuestionStore = create<State>()(
         },
 
         selectAnswer: (questionId: number, selectedAnswer: string, timeTakenMs?: number) => {
-          const { questions } = get();
+          const { questions, selectedQuizz } = get();
           // usar el structuredClone para clonar el objeto
           const newQuestions = structuredClone(questions);
           // encontramos el índice de la pregunta
@@ -156,8 +168,19 @@ export const useQuestionStore = create<State>()(
           const isCorrectUserAnswer =
             questionInfo.answer === selectedAnswer;
 
+          // Get quiz options for time-based scoring configuration
+          const timeBasedScoring = selectedQuizz?.options?.timeBasedScoring ?? true;
+          const fullPointsThreshold = selectedQuizz?.options?.fullPointsThreshold ?? 5000;
+          const halfPointsThreshold = selectedQuizz?.options?.halfPointsThreshold ?? 10000;
+
           // Calculate points based on time taken (default to 0 if no time provided)
-          const pointsEarned = calculatePointsFromTime(timeTakenMs || 0, isCorrectUserAnswer);
+          const pointsEarned = calculatePointsFromTime(
+            timeTakenMs || 0, 
+            isCorrectUserAnswer,
+            timeBasedScoring,
+            fullPointsThreshold,
+            halfPointsThreshold
+          );
 
           // cambiar esta información en la copia de la pregunta
           newQuestions[questionIndex] = {
