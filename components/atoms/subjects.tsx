@@ -10,6 +10,8 @@ const DECIMALS = 1;
 
 function formatPoints(value: number) {
   if (!Number.isFinite(value)) return String(value);
+  // If value has no fractional part, show integer without decimals
+  if (Number.isInteger(value)) return String(value);
   return value.toFixed(DECIMALS);
 }
 
