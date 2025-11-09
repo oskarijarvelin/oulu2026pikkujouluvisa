@@ -164,7 +164,7 @@ const Subjects = ({ data }: SubjectsProps) => {
               </p>
               {/* Always show score field — use '-' for unknown best */}
               <span className="text-sm text-yotaivas dark:text-valkoinen opacity-75">
-                Pisteesi:<br/>{isPlayed ? `${score.best}/${score.total}` : `-/${score.total}`}
+                Pisteesi:<br/>{isPlayed ? `${formatPoints(score.best!)}/${score.total}` : `-/${score.total}`}
               </span>
             </div>
           </button>
