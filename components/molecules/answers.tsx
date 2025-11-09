@@ -111,6 +111,14 @@ const Answers = ({
     };
   }, [questionId]);
 
+  // Calculate cumulative score from all answered questions
+  const cumulativeScore = questions.reduce((total, q) => {
+    if (q.userSelectedAnswer != null && q.pointsEarned !== undefined) {
+      return total + q.pointsEarned;
+    }
+    return total;
+  }, 0);
+
   return (
     <>
       {/* progress bar visualizing 1.5s wait after answering */}
@@ -150,6 +158,19 @@ const Answers = ({
           />
         ))}
       </ul>
+      {/* Score count display under the options */}
+      <div className="mt-4 flex items-center justify-center gap-2 text-yotaivas dark:text-valkoinen">
+        <span className="text-lg font-semibold">Pisteet yhteensä:</span>
+        <span className="text-2xl font-bold">{cumulativeScore.toFixed(1)}</span>
+        {selectedAns && pointsEarned !== undefined && (
+          <span className={cn(
+            "text-lg font-bold ml-2",
+            isCorrectUserAnswer ? "text-metsa" : "text-puolukka"
+          )}>
+            ({isCorrectUserAnswer ? '+' : ''}{pointsEarned.toFixed(1)}p)
+          </span>
+        )}
+      </div>
     </>
   );
 };

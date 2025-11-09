@@ -1,5 +1,5 @@
 "use client";
-import { backgroundColors } from "@/lib/utils";
+import { backgroundColors, getLucideIcon } from "@/lib/utils";
 import { useQuestionStore } from "@/store/quiz-store";
 import Image from "next/image";
 import { useEffect } from "react";
@@ -79,14 +79,24 @@ const Score = () => {
   }[];
   const scores = quizScores.map((s) => s.score);
 
+  // Determine which icon to use
+  const useLucideIcon = selectedQuizz.options?.icon;
+  const LucideIconComponent = useLucideIcon ? getLucideIcon(useLucideIcon) : null;
+  const iconColor = selectedQuizz.options?.iconColor || "#000000";
+  const iconBgColor = selectedQuizz.options?.iconBgColor || backgroundColors[selectedQuizz.title] || selectedQuizz.bgcolor;
+
   return (
     <div className="flex flex-col gap-4 bg-[#fff] dark:bg-slate p-10 rounded-xl">
       <div className="flex gap-x-2 items-center justify-center">
         <div
           className="xs:p-1 p-2 rounded-lg"
-          style={{ backgroundColor: backgroundColors[selectedQuizz.title] }}
+          style={{ backgroundColor: iconBgColor }}
         >
-          <Image src={selectedQuizz.icon} alt="arrow" width={30} height={30} />
+          {LucideIconComponent ? (
+            <LucideIconComponent size={30} color={iconColor} strokeWidth={2} />
+          ) : (
+            <Image src={selectedQuizz.icon} alt="arrow" width={30} height={30} />
+          )}
         </div>
         <p className="text-dark-blue dark:text-white font-bold xs:text-xl md:text-2xl">
           {selectedQuizz.title}

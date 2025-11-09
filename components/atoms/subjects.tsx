@@ -2,7 +2,7 @@
 import { Quizz } from "@/lib/types";
 import { useQuestionStore } from "@/store/quiz-store";
 import Image from "next/image";
-import { cn } from "@/lib/utils";
+import { cn, getLucideIcon } from "@/lib/utils";
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
@@ -20,7 +20,12 @@ type SubjectsProps = {
 };
 
 const Subjects = ({ data }: SubjectsProps) => {
-  const subjects = data.map((q) => ({ title: q.title, icon: q.icon, bgcolor: q.bgcolor }));
+  const subjects = data.map((q) => ({ 
+    title: q.title, 
+    icon: q.icon, 
+    bgcolor: q.bgcolor,
+    options: q.options
+  }));
   const selectQuizz = useQuestionStore((state) => state.selectQuizz);
 
   // Player name handling
@@ -126,6 +131,12 @@ const Subjects = ({ data }: SubjectsProps) => {
       {subjects.map((subject) => {
         const score = getQuizScore(subject.title);
         const isPlayed = score.best !== null;
+        
+        // Determine which icon to use
+        const useLucideIcon = subject.options?.icon;
+        const LucideIconComponent = useLucideIcon ? getLucideIcon(useLucideIcon) : null;
+        const iconColor = subject.options?.iconColor || "#000000";
+        const iconBgColor = subject.options?.iconBgColor || subject.bgcolor;
 
         return (
           <button
@@ -145,15 +156,24 @@ const Subjects = ({ data }: SubjectsProps) => {
           >
             <div
               className={cn("p-2 rounded-lg", isPlayed && "opacity-75")}
-              style={{ backgroundColor: subject.bgcolor }}
+              style={{ backgroundColor: iconBgColor }}
             >
-              <Image
-                src={subject.icon}
-                alt="arrow"
-                width={30}
-                height={30}
-                className={isPlayed ? "opacity-50" : ""}
-              />
+              {LucideIconComponent ? (
+                <LucideIconComponent 
+                  size={30} 
+                  color={iconColor} 
+                  strokeWidth={2}
+                  className={isPlayed ? "opacity-50" : ""}
+                />
+              ) : (
+                <Image
+                  src={subject.icon}
+                  alt="arrow"
+                  width={30}
+                  height={30}
+                  className={isPlayed ? "opacity-50" : ""}
+                />
+              )}
             </div>
             <div className="flex items-center justify-between gap-x-2 w-full">
               <p
