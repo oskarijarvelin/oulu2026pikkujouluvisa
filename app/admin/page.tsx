@@ -3,7 +3,7 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { fetchQuizzesFromFirebase, saveQuizzesToFirebase } from "@/lib/firebase-service";
 import { Quizz, Question } from "@/lib/types";
-import { Trash2, Plus, Save, RotateCcw } from "lucide-react";
+import { Trash2, Plus, Save, RotateCcw, Gamepad2 } from "lucide-react";
 
 export default function AdminPage() {
   const router = useRouter();
@@ -147,13 +147,10 @@ export default function AdminPage() {
   const addQuiz = () => {
     const newQuiz: Quizz = {
       title: "Uusi Visa",
-      icon: "./assets/images/icon-html.svg",
-      bgcolor: "#FFF1E9",
       options: {
         timeBasedScoring: true,
         fullPointsThreshold: 5000,
         halfPointsThreshold: 10000,
-        icon: "Code2",
         iconColor: "#E44D26",
         iconBgColor: "#FFF1E9",
       },
@@ -171,26 +168,26 @@ export default function AdminPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 dark:bg-gray-900 flex items-center justify-center">
+      <div className="min-h-screen bg-harmaa dark:bg-gray-900 flex items-center justify-center">
         <div className="text-xl text-gray-700 dark:text-gray-300">Ladataan...</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-900">
+    <div className="min-h-screen bg-valkoinen dark:bg-gray-900">
       {/* Floating Header with Buttons */}
-      <div className="sticky top-0 z-50 bg-white dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700">
+      <div className="sticky top-0 z-50 bg-valkoinen dark:bg-gray-800 shadow-lg border-b border-gray-200 dark:border-gray-700">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
           <div className="flex items-center justify-between">
-            <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
-              Visailun Muokkaustyökalu
+            <h1 className="text-2xl font-bold text-gray-900 dark:text-valkoinen">
+              Visaeditori
             </h1>
             <div className="flex gap-3">
               <button
                 onClick={handleCancel}
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-harmaa hover:bg-harmaa/70 text-musta rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <RotateCcw size={18} />
                 Peruuta
@@ -198,10 +195,17 @@ export default function AdminPage() {
               <button
                 onClick={handleSave}
                 disabled={saving}
-                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
+                className="flex items-center gap-2 px-4 py-2 bg-yotaivas hover:bg-perameri text-valkoinen rounded-lg transition disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <Save size={18} />
                 {saving ? "Tallennetaan..." : "Tallenna muutokset"}
+              </button>
+              <button
+                onClick={() => router.push("/")}
+                className="flex items-center gap-2 px-4 py-2 bg-perameri hover:bg-yotaivas text-valkoinen rounded-lg transition"
+              >
+                <Gamepad2 size={18} />
+                Pelaa visoja
               </button>
             </div>
           </div>
@@ -216,7 +220,7 @@ export default function AdminPage() {
         <div className="mb-6">
           <button
             onClick={addQuiz}
-            className="flex items-center gap-2 px-4 py-2 bg-green-600 hover:bg-green-700 text-white rounded-lg transition"
+            className="flex items-center gap-2 px-4 py-2 bg-yotaivas hover:bg-perameri text-valkoinen rounded-lg transition"
           >
             <Plus size={18} />
             Lisää Uusi Visa
@@ -226,7 +230,7 @@ export default function AdminPage() {
         {quizzes.map((quiz, quizIndex) => (
           <div
             key={quizIndex}
-            className="mb-8 bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6"
+            className="mb-8 bg-harmaa/50 dark:bg-gray-800 rounded-lg shadow-lg p-6"
           >
             {/* Quiz Header */}
             <div className="flex items-start justify-between mb-6 pb-4 border-b border-gray-200 dark:border-gray-700">
@@ -239,32 +243,8 @@ export default function AdminPage() {
                     type="text"
                     value={quiz.title}
                     onChange={(e) => updateQuiz(quizIndex, "title", e.target.value)}
-                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
+                    className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-valkoinen dark:bg-gray-700 text-gray-900 dark:text-valkoinen"
                   />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Ikoni Polku
-                    </label>
-                    <input
-                      type="text"
-                      value={quiz.icon}
-                      onChange={(e) => updateQuiz(quizIndex, "icon", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
-                  <div>
-                    <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-                      Taustaväri
-                    </label>
-                    <input
-                      type="text"
-                      value={quiz.bgcolor}
-                      onChange={(e) => updateQuiz(quizIndex, "bgcolor", e.target.value)}
-                      className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded-md bg-white dark:bg-gray-700 text-gray-900 dark:text-white"
-                    />
-                  </div>
                 </div>
 
                 {/* Quiz Options */}
@@ -272,7 +252,7 @@ export default function AdminPage() {
                   <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">
                     Asetukset
                   </h3>
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-3 gap-4">
                     <div>
                       <label className="flex items-center gap-2 text-sm text-gray-700 dark:text-gray-300">
                         <input
@@ -298,7 +278,7 @@ export default function AdminPage() {
                             onChange={(e) =>
                               updateQuiz(quizIndex, "options.fullPointsThreshold", parseInt(e.target.value))
                             }
-                            className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                            className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-valkoinen dark:bg-gray-700 text-gray-900 dark:text-valkoinen text-sm"
                           />
                         </div>
                         <div>
@@ -311,7 +291,7 @@ export default function AdminPage() {
                             onChange={(e) =>
                               updateQuiz(quizIndex, "options.halfPointsThreshold", parseInt(e.target.value))
                             }
-                            className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                            className="w-full px-2 py-1 border border-gray-300 dark:border-gray-600 rounded bg-valkoinen dark:bg-gray-700 text-gray-900 dark:text-valkoinen text-sm"
                           />
                         </div>
                       </>
@@ -330,12 +310,12 @@ export default function AdminPage() {
             {/* Questions */}
             <div className="space-y-4">
               <div className="flex items-center justify-between">
-                <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+                <h3 className="text-lg font-semibold text-gray-900 dark:text-valkoinen">
                   Kysymykset ({quiz.questions.length})
                 </h3>
                 <button
                   onClick={() => addQuestion(quizIndex)}
-                  className="flex items-center gap-2 px-3 py-1 bg-blue-500 hover:bg-blue-600 text-white rounded text-sm transition"
+                  className="flex items-center gap-2 px-3 py-1 bg-yotaivas hover:bg-perameri text-valkoinen rounded text-sm transition"
                 >
                   <Plus size={16} />
                   Lisää Kysymys
@@ -345,7 +325,7 @@ export default function AdminPage() {
               {quiz.questions.map((question, questionIndex) => (
                 <div
                   key={questionIndex}
-                  className="bg-gray-50 dark:bg-gray-700/50 rounded-lg p-4 space-y-3"
+                  className="bg-valkoinen/60 dark:bg-gray-700/50 rounded-lg p-4 space-y-3"
                 >
                   <div className="flex items-start justify-between">
                     <div className="flex-1 space-y-3">
@@ -359,7 +339,7 @@ export default function AdminPage() {
                             updateQuestion(quizIndex, questionIndex, "question", e.target.value)
                           }
                           rows={2}
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-valkoinen dark:bg-gray-700 text-gray-900 dark:text-valkoinen text-sm"
                         />
                       </div>
 
@@ -376,7 +356,7 @@ export default function AdminPage() {
                               onChange={(e) =>
                                 updateQuestionOption(quizIndex, questionIndex, optionIndex, e.target.value)
                               }
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-valkoinen dark:bg-gray-700 text-gray-900 dark:text-valkoinen text-sm"
                             />
                           ))}
                         </div>
@@ -391,7 +371,7 @@ export default function AdminPage() {
                           onChange={(e) =>
                             updateQuestion(quizIndex, questionIndex, "answer", e.target.value)
                           }
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-white dark:bg-gray-700 text-gray-900 dark:text-white text-sm"
+                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-valkoinen dark:bg-gray-700 text-gray-900 dark:text-valkoinen text-sm"
                         >
                           {question.options.map((option, optIdx) => (
                             <option key={optIdx} value={option}>

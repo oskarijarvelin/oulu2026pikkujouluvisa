@@ -22,8 +22,6 @@ type SubjectsProps = {
 const Subjects = ({ data }: SubjectsProps) => {
   const subjects = data.map((q) => ({ 
     title: q.title, 
-    icon: q.icon, 
-    bgcolor: q.bgcolor,
     options: q.options
   }));
   const selectQuizz = useQuestionStore((state) => state.selectQuizz);
@@ -133,10 +131,8 @@ const Subjects = ({ data }: SubjectsProps) => {
         const isPlayed = score.best !== null;
         
         // Determine which icon to use
-        const useLucideIcon = subject.options?.icon;
-        const LucideIconComponent = useLucideIcon ? getLucideIcon(useLucideIcon) : null;
         const iconColor = subject.options?.iconColor || "#000000";
-        const iconBgColor = subject.options?.iconBgColor || subject.bgcolor;
+        const iconBgColor = subject.options?.iconBgColor || "#FFFFFF";
 
         return (
           <button
@@ -155,25 +151,14 @@ const Subjects = ({ data }: SubjectsProps) => {
             )}
           >
             <div
-              className={cn("p-2 rounded-lg", isPlayed && "opacity-75")}
-              style={{ backgroundColor: iconBgColor }}
-            >
-              {LucideIconComponent ? (
-                <LucideIconComponent 
-                  size={30} 
-                  color={iconColor} 
-                  strokeWidth={2}
-                  className={isPlayed ? "opacity-50" : ""}
-                />
-              ) : (
-                <Image
-                  src={subject.icon}
-                  alt="arrow"
-                  width={30}
-                  height={30}
-                  className={isPlayed ? "opacity-50" : ""}
-                />
+              className={cn(
+                "w-10 h-10 flex items-center justify-center rounded-lg text-lg font-bold select-none",
+                isPlayed && "opacity-75"
               )}
+              style={{ backgroundColor: iconBgColor, color: iconColor }}
+              aria-hidden
+            >
+              {subject.title?.charAt(0).toUpperCase() || "?"}
             </div>
             <div className="flex items-center justify-between gap-x-2 w-full">
               <p
