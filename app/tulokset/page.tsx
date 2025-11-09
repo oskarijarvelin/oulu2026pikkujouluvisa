@@ -8,6 +8,13 @@ import { cn } from "@/lib/utils";
 import { initFirebase } from "@/lib/firebase";
 import { getDatabase, ref, onValue, off } from "firebase/database";
 
+const DECIMALS = 1;
+function formatPoints(value: number) {
+  if (!Number.isFinite(value)) return String(value);
+  if (Number.isInteger(value)) return String(value);
+  return value.toFixed(DECIMALS);
+}
+
 type LeaderboardRow = {
   name: string;
   total: number;
@@ -288,7 +295,7 @@ export default function Tulokset() {
                             </div>
                           </td>
                           <td className="py-3 px-3">
-                            {row.total}/{totalPossible}
+                            {formatPoints(row.total)}/{totalPossible}
                           </td>
                           <td className="py-3 px-3">{percent}%</td>
                         </tr>
