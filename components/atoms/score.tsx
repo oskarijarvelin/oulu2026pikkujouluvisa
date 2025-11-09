@@ -94,7 +94,7 @@ const Score = () => {
       </div>
       <div className="flex flex-col justify-center items-center gap-4">
         <p className="text-dark-blue dark:text-white my-10 font-bold xs:text-5xl sm:text-5xl lg:text-9xl">
-          {score}/{selectedQuizz.questions.length}
+          {score.toFixed(1)}/{selectedQuizz.questions.length}
         </p>
       </div>
     </div>

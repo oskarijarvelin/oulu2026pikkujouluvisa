@@ -11,7 +11,7 @@ interface State {
   score: number;
   selectQuizz: (quizz: Quizz) => void;
   fetchQuizzes: () => Promise<void>;
-  selectAnswer: (questionId: number, selectedAnswer: string) => void;
+  selectAnswer: (questionId: number, selectedAnswer: string, timeTakenMs?: number) => void;
   goNextQuestion: () => void;
   goPreviousQuestion: () => void;
   onCompleteQuestions: () => void;
@@ -94,6 +94,30 @@ function getOrCreateShuffledQuestions<T extends { id: number }>(
   return shuffled;
 }
 
+/**
+ * Calculate points based on time taken to answer:
+ * - <= 5000ms: 1.0 points (full points)
+ * - >= 10000ms: 0.5 points (half points)
+ * - Between 5000-10000ms: linear decrease with 0.1 point steps
+ */
+function calculatePointsFromTime(timeTakenMs: number, isCorrect: boolean): number {
+  if (!isCorrect) return 0;
+  
+  const timeInSeconds = timeTakenMs / 1000;
+  
+  if (timeInSeconds <= 5) {
+    return 1.0;
+  } else if (timeInSeconds >= 10) {
+    return 0.5;
+  } else {
+    // Linear interpolation between 5 and 10 seconds
+    // At 5s: 1.0, at 10s: 0.5, so slope is -0.1 per second
+    const points = 1.0 - ((timeInSeconds - 5) * 0.1);
+    // Round to nearest 0.1 to ensure clean 0.1 point decreases
+    return Math.round(points * 10) / 10;
+  }
+}
+
 export const useQuestionStore = create<State>()(
   persist(
     (set, get) => {
@@ -118,7 +142,7 @@ export const useQuestionStore = create<State>()(
           }
         },
 
-        selectAnswer: (questionId: number, selectedAnswer: string) => {
+        selectAnswer: (questionId: number, selectedAnswer: string, timeTakenMs?: number) => {
           const { questions } = get();
           // usar el structuredClone para clonar el objeto
           const newQuestions = structuredClone(questions);
@@ -132,19 +156,22 @@ export const useQuestionStore = create<State>()(
           const isCorrectUserAnswer =
             questionInfo.answer === selectedAnswer;
 
+          // Calculate points based on time taken (default to 0 if no time provided)
+          const pointsEarned = calculatePointsFromTime(timeTakenMs || 0, isCorrectUserAnswer);
 
           // cambiar esta información en la copia de la pregunta
           newQuestions[questionIndex] = {
             ...questionInfo,
             isCorrectUserAnswer,
             userSelectedAnswer: selectedAnswer,
+            pointsEarned,
           };
           // actualizamos el estado
           set({ questions: newQuestions }, false);
         },
         onCompleteQuestions: () => {
           const { questions } = get();
-          const score = questions.filter((q) => q.isCorrectUserAnswer).length;
+          const score = questions.reduce((total, q) => total + (q.pointsEarned || 0), 0);
 
           set({ hasCompleteAll: true, currentQuestion: 0, score });
         },

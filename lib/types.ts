@@ -5,6 +5,7 @@ export interface Question {
   answer: string;
   isCorrectUserAnswer?: boolean | null;
   userSelectedAnswer?: string | null;
+  pointsEarned?: number;
 }
 
 export interface Quizz {
