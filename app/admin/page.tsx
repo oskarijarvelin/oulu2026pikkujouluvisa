@@ -31,10 +31,26 @@ export default function AdminPage() {
     setError(null);
     try {
       const data = await fetchQuizzesFromFirebase();
-      setQuizzes(data);
+      if (data && data.length > 0) {
+        setQuizzes(data);
+      } else {
+        // If no data in Firebase, load from static file as fallback
+        const res = await fetch("/data.json");
+        const json = await res.json();
+        setQuizzes(json.quizzes);
+        setError("Ladattu staattisesta tiedostosta. Firebasessa ei ole dataa.");
+      }
     } catch (err) {
-      setError("Failed to load quizzes from Firebase");
-      console.error(err);
+      // Fallback to static file if Firebase fails
+      try {
+        const res = await fetch("/data.json");
+        const json = await res.json();
+        setQuizzes(json.quizzes);
+        setError("Firebase ei ole käytössä. Ladattu staattisesta tiedostosta.");
+      } catch (fileErr) {
+        setError("Virhe ladattaessa tietoja");
+        console.error(err, fileErr);
+      }
     } finally {
       setLoading(false);
     }

@@ -9,6 +9,11 @@ const QUIZZES_PATH = "quizzes";
  */
 export async function fetchQuizzesFromFirebase(): Promise<Quizz[]> {
   try {
+    // Check if Firebase is configured
+    if (!process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL) {
+      throw new Error("Firebase not configured");
+    }
+    
     const db = getDb();
     const quizzesRef = ref(db, QUIZZES_PATH);
     const snapshot = await get(quizzesRef);
