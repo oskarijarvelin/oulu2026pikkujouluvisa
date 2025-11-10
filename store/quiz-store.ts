@@ -12,7 +12,7 @@ interface State {
   score: number;
   selectQuizz: (quizz: Quizz) => void;
   fetchQuizzes: () => Promise<void>;
-  selectAnswer: (questionId: number, selectedAnswer: string, timeTakenMs?: number) => void;
+  selectAnswer: (questionId: number, selectedAnswer: string | string[], timeTakenMs?: number) => void;
   goNextQuestion: () => void;
   goPreviousQuestion: () => void;
   onCompleteQuestions: () => void;
@@ -167,7 +167,7 @@ export const useQuestionStore = create<State>()(
           }
         },
 
-        selectAnswer: (questionId: number, selectedAnswer: string, timeTakenMs?: number) => {
+        selectAnswer: (questionId: number, selectedAnswer: string | string[], timeTakenMs?: number) => {
           const { questions, selectedQuizz } = get();
           // usar el structuredClone para clonar el objeto
           const newQuestions = structuredClone(questions);
@@ -177,9 +177,25 @@ export const useQuestionStore = create<State>()(
           );
           // obtenemos la información de la pregunta
           const questionInfo = newQuestions[questionIndex];
+          
           // averiguamos si el usuario ha seleccionado la respuesta correcta
-          const isCorrectUserAnswer =
-            questionInfo.answer === selectedAnswer;
+          let isCorrectUserAnswer: boolean;
+          
+          if (Array.isArray(questionInfo.answer)) {
+            // Multiple correct answers - check if user's selection matches exactly
+            const correctAnswers = questionInfo.answer;
+            const userAnswers = Array.isArray(selectedAnswer) ? selectedAnswer : [selectedAnswer];
+            
+            // Check if arrays have same length and contain same elements (order doesn't matter)
+            isCorrectUserAnswer = 
+              correctAnswers.length === userAnswers.length &&
+              correctAnswers.every(ans => userAnswers.includes(ans)) &&
+              userAnswers.every(ans => correctAnswers.includes(ans));
+          } else {
+            // Single correct answer
+            const userAnswer = Array.isArray(selectedAnswer) ? selectedAnswer[0] : selectedAnswer;
+            isCorrectUserAnswer = questionInfo.answer === userAnswer;
+          }
 
           // Get quiz options for time-based scoring configuration
           const timeBasedScoring = selectedQuizz?.options?.timeBasedScoring ?? true;

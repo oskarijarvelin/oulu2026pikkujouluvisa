@@ -115,8 +115,91 @@ export default function AdminPage() {
     const updated = [...quizzes];
     const questions = [...updated[quizIndex].questions];
     const options = [...questions[questionIndex].options];
+    const oldOption = options[optionIndex];
     options[optionIndex] = value;
+    
+    // Update answer references if the old option was marked as correct
+    let answer = questions[questionIndex].answer;
+    if (Array.isArray(answer)) {
+      answer = answer.map(a => a === oldOption ? value : a);
+    } else if (answer === oldOption) {
+      answer = value;
+    }
+    
+    questions[questionIndex] = { ...questions[questionIndex], options, answer };
+    updated[quizIndex] = { ...updated[quizIndex], questions };
+    setQuizzes(updated);
+  };
+
+  // Add option to a question (max 4)
+  const addQuestionOption = (quizIndex: number, questionIndex: number) => {
+    const updated = [...quizzes];
+    const questions = [...updated[quizIndex].questions];
+    const options = [...questions[questionIndex].options];
+    
+    if (options.length >= 4) return; // Max 4 options
+    
+    options.push(`Vaihtoehto ${options.length + 1}`);
     questions[questionIndex] = { ...questions[questionIndex], options };
+    updated[quizIndex] = { ...updated[quizIndex], questions };
+    setQuizzes(updated);
+  };
+
+  // Remove option from a question (min 2)
+  const removeQuestionOption = (quizIndex: number, questionIndex: number, optionIndex: number) => {
+    const updated = [...quizzes];
+    const questions = [...updated[quizIndex].questions];
+    const options = [...questions[questionIndex].options];
+    
+    if (options.length <= 2) return; // Min 2 options
+    
+    const removedOption = options[optionIndex];
+    options.splice(optionIndex, 1);
+    
+    // Update answer references if the removed option was marked as correct
+    let answer = questions[questionIndex].answer;
+    if (Array.isArray(answer)) {
+      answer = answer.filter(a => a !== removedOption);
+      // If no answers left, set first option as correct
+      if (answer.length === 0) {
+        answer = [options[0]];
+      }
+    } else if (answer === removedOption) {
+      answer = options[0];
+    }
+    
+    questions[questionIndex] = { ...questions[questionIndex], options, answer };
+    updated[quizIndex] = { ...updated[quizIndex], questions };
+    setQuizzes(updated);
+  };
+
+  // Toggle correct answer checkbox
+  const toggleCorrectAnswer = (quizIndex: number, questionIndex: number, option: string) => {
+    const updated = [...quizzes];
+    const questions = [...updated[quizIndex].questions];
+    let answer = questions[questionIndex].answer;
+    
+    // Convert to array if it's a string
+    let answerArray: string[] = Array.isArray(answer) ? [...answer] : [answer];
+    
+    if (answerArray.includes(option)) {
+      // Remove if already checked (but keep at least one)
+      answerArray = answerArray.filter(a => a !== option);
+      if (answerArray.length === 0) {
+        // Don't allow removing the last correct answer
+        return;
+      }
+    } else {
+      // Add if not checked (max 4)
+      if (answerArray.length >= 4) return;
+      answerArray.push(option);
+    }
+    
+    // Store as array if multiple, or single string if only one
+    questions[questionIndex] = { 
+      ...questions[questionIndex], 
+      answer: answerArray.length === 1 ? answerArray[0] : answerArray 
+    };
     updated[quizIndex] = { ...updated[quizIndex], questions };
     setQuizzes(updated);
   };
@@ -127,7 +210,7 @@ export default function AdminPage() {
     const newQuestion: Question = {
       id: Date.now(),
       question: "Uusi kysymys",
-      options: ["Vaihtoehto 1", "Vaihtoehto 2", "Vaihtoehto 3", "Vaihtoehto 4"],
+      options: ["Vaihtoehto 1", "Vaihtoehto 2"],
       answer: "Vaihtoehto 1",
     };
     updated[quizIndex].questions = [...updated[quizIndex].questions, newQuestion];
@@ -344,41 +427,61 @@ export default function AdminPage() {
                       </div>
 
                       <div>
-                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                          Vaihtoehdot
-                        </label>
-                        <div className="space-y-2">
-                          {question.options.map((option, optionIndex) => (
-                            <input
-                              key={optionIndex}
-                              type="text"
-                              value={option}
-                              onChange={(e) =>
-                                updateQuestionOption(quizIndex, questionIndex, optionIndex, e.target.value)
-                              }
-                              className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-valkoinen dark:bg-gray-700 text-gray-900 dark:text-valkoinen text-sm"
-                            />
-                          ))}
+                        <div className="flex items-center justify-between mb-1">
+                          <label className="block text-xs font-medium text-gray-600 dark:text-gray-400">
+                            Vaihtoehdot (2-4)
+                          </label>
+                          <div className="flex gap-2">
+                            {question.options.length < 4 && (
+                              <button
+                                onClick={() => addQuestionOption(quizIndex, questionIndex)}
+                                className="text-xs px-2 py-1 bg-yotaivas hover:bg-perameri text-valkoinen rounded transition"
+                              >
+                                + Lisää
+                              </button>
+                            )}
+                          </div>
                         </div>
-                      </div>
-
-                      <div>
-                        <label className="block text-xs font-medium text-gray-600 dark:text-gray-400 mb-1">
-                          Oikea Vastaus
-                        </label>
-                        <select
-                          value={question.answer}
-                          onChange={(e) =>
-                            updateQuestion(quizIndex, questionIndex, "answer", e.target.value)
-                          }
-                          className="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-valkoinen dark:bg-gray-700 text-gray-900 dark:text-valkoinen text-sm"
-                        >
-                          {question.options.map((option, optIdx) => (
-                            <option key={optIdx} value={option}>
-                              {option}
-                            </option>
-                          ))}
-                        </select>
+                        <div className="space-y-2">
+                          {question.options.map((option, optionIndex) => {
+                            const answerArray = Array.isArray(question.answer) 
+                              ? question.answer 
+                              : [question.answer];
+                            const isCorrect = answerArray.includes(option);
+                            
+                            return (
+                              <div key={optionIndex} className="flex items-center gap-2">
+                                <input
+                                  type="checkbox"
+                                  checked={isCorrect}
+                                  onChange={() => toggleCorrectAnswer(quizIndex, questionIndex, option)}
+                                  className="rounded"
+                                  title="Merkitse oikeaksi vastaukseksi"
+                                />
+                                <input
+                                  type="text"
+                                  value={option}
+                                  onChange={(e) =>
+                                    updateQuestionOption(quizIndex, questionIndex, optionIndex, e.target.value)
+                                  }
+                                  className="flex-1 px-3 py-2 border border-gray-300 dark:border-gray-600 rounded bg-valkoinen dark:bg-gray-700 text-gray-900 dark:text-valkoinen text-sm"
+                                />
+                                {question.options.length > 2 && (
+                                  <button
+                                    onClick={() => removeQuestionOption(quizIndex, questionIndex, optionIndex)}
+                                    className="p-2 text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition"
+                                    title="Poista vaihtoehto"
+                                  >
+                                    <Trash2 size={14} />
+                                  </button>
+                                )}
+                              </div>
+                            );
+                          })}
+                        </div>
+                        <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+                          Valitse 1-4 oikeaa vastausta rastittamalla vaihtoehdot
+                        </p>
                       </div>
                     </div>
                     <button
