@@ -2,9 +2,9 @@ export interface Question {
   id: number;
   question: string;
   options: string[];
-  answer: string;
+  answer: string | string[]; // Can be single answer or array of answers
   isCorrectUserAnswer?: boolean | null;
-  userSelectedAnswer?: string | null;
+  userSelectedAnswer?: string | string[] | null; // Can be single or multiple selections
   pointsEarned?: number;
 }
 
