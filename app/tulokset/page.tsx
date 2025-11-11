@@ -5,7 +5,7 @@ import { useQuestionStore } from "@/store/quiz-store";
 import { useEffect, useState } from "react";
 import { MotionDiv } from "@/components/animated/motion-div";
 import { cn } from "@/lib/utils";
-import { initFirebase } from "@/lib/firebase";
+import { initFirebase, ensureAuthenticated } from "@/lib/firebase";
 import { getDatabase, ref, onValue, off } from "firebase/database";
 
 const DECIMALS = 1;
@@ -86,63 +86,43 @@ export default function Tulokset() {
     }
   };
 
-  // Try to read leaderboard from Firebase Realtime Database; fall back to localStorage
+  // Try to read leaderboard from Firebase Realtime Database with authentication; fall back to localStorage
   useEffect(() => {
     // init firebase app (uses NEXT_PUBLIC_ env vars)
-    try {
-      initFirebase();
-    } catch (e) {
-      // init failed or config missing -> fallback immediately
-      buildFromLocalStorage();
-      return;
-    }
+    (async () => {
+      try {
+        initFirebase();
+        
+        // Ensure user is authenticated before reading from database
+        await ensureAuthenticated();
+      } catch (e) {
+        // init or auth failed -> fallback immediately
+        buildFromLocalStorage();
+        return;
+      }
 
-    const db = getDatabase();
-    const leaderboardRef = ref(db, "leaderboard");
+      const db = getDatabase();
+      const leaderboardRef = ref(db, "leaderboard");
 
-    const unsubscribe = onValue(
-      leaderboardRef,
-      (snapshot) => {
-        const val = snapshot.val();
-        if (!val) {
-          // no data in firebase -> fallback to localStorage
-          buildFromLocalStorage();
-          return;
-        }
+      const unsubscribe = onValue(
+        leaderboardRef,
+        (snapshot) => {
+          const val = snapshot.val();
+          if (!val) {
+            // no data in firebase -> fallback to localStorage
+            buildFromLocalStorage();
+            return;
+          }
 
-        // Support both array and object shapes from DB
-        const rows: LeaderboardRow[] = [];
+          // Support both array and object shapes from DB
+          const rows: LeaderboardRow[] = [];
 
-        if (Array.isArray(val)) {
-          // array of rows { name, total, playedCount, perQuiz }
-          val.forEach((r: any) => {
-            if (!r) return;
-            rows.push({
-              name: r.name || "Unknown",
-              total: typeof r.total === "number" ? r.total : 0,
-              playedCount:
-                typeof r.playedCount === "number"
-                  ? r.playedCount
-                  : r.perQuiz
-                    ? Object.keys(r.perQuiz).length
-                    : 0,
-              perQuiz: r.perQuiz || {},
-            });
-          });
-        } else if (typeof val === "object") {
-          // object keyed by player name or id
-          Object.entries(val).forEach(([key, v]) => {
-            const r = v as any;
-            // if val[key] already contains name/total/perQuiz, use it,
-            // otherwise key might be the player name and value is perQuiz
-            if (
-              r &&
-              (typeof r.total === "number" ||
-                typeof r.playedCount === "number" ||
-                r.perQuiz)
-            ) {
+          if (Array.isArray(val)) {
+            // array of rows { name, total, playedCount, perQuiz }
+            val.forEach((r: any) => {
+              if (!r) return;
               rows.push({
-                name: r.name || key,
+                name: r.name || "Unknown",
                 total: typeof r.total === "number" ? r.total : 0,
                 playedCount:
                   typeof r.playedCount === "number"
@@ -152,44 +132,68 @@ export default function Tulokset() {
                       : 0,
                 perQuiz: r.perQuiz || {},
               });
-            } else if (r && typeof r === "object") {
-              // treat r as perQuiz map
-              const perQuiz = r as Record<string, number>;
-              const total = Object.values(perQuiz).reduce(
-                (s, v) => s + (typeof v === "number" ? v : 0),
-                0
-              );
-              rows.push({
-                name: key,
-                total,
-                playedCount: Object.keys(perQuiz).length,
-                perQuiz,
-              });
-            } else {
-              // unknown shape -> skip
-            }
-          });
+            });
+          } else if (typeof val === "object") {
+            // object keyed by player name or id
+            Object.entries(val).forEach(([key, v]) => {
+              const r = v as any;
+              // if val[key] already contains name/total/perQuiz, use it,
+              // otherwise key might be the player name and value is perQuiz
+              if (
+                r &&
+                (typeof r.total === "number" ||
+                  typeof r.playedCount === "number" ||
+                  r.perQuiz)
+              ) {
+                rows.push({
+                  name: r.name || key,
+                  total: typeof r.total === "number" ? r.total : 0,
+                  playedCount:
+                    typeof r.playedCount === "number"
+                      ? r.playedCount
+                      : r.perQuiz
+                        ? Object.keys(r.perQuiz).length
+                        : 0,
+                  perQuiz: r.perQuiz || {},
+                });
+              } else if (r && typeof r === "object") {
+                // treat r as perQuiz map
+                const perQuiz = r as Record<string, number>;
+                const total = Object.values(perQuiz).reduce(
+                  (s, v) => s + (typeof v === "number" ? v : 0),
+                  0
+                );
+                rows.push({
+                  name: key,
+                  total,
+                  playedCount: Object.keys(perQuiz).length,
+                  perQuiz,
+                });
+              } else {
+                // unknown shape -> skip
+              }
+            });
+          }
+
+          rows.sort((a, b) => b.total - a.total || b.playedCount - a.playedCount);
+          setLeaderboard(rows);
+        },
+        (err) => {
+          // read error -> fallback
+          console.error("Firebase leaderboard read failed:", err);
+          buildFromLocalStorage();
         }
+      );
 
-        rows.sort((a, b) => b.total - a.total || b.playedCount - a.playedCount);
-        setLeaderboard(rows);
-      },
-      (err) => {
-        // read error -> fallback
-        console.error("Firebase leaderboard read failed:", err);
-        buildFromLocalStorage();
-      }
-    );
-
-    // cleanup
-    return () => {
-      try {
-        off(leaderboardRef);
-      } catch (e) {
-        // ignore
-      }
-      // Firebase onValue returns nothing to call; off() removes listener.
-    };
+      // cleanup
+      return () => {
+        try {
+          off(leaderboardRef);
+        } catch (e) {
+          // ignore
+        }
+      };
+    })();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [quizzes]);
 

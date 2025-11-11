@@ -82,12 +82,26 @@ Path: `/quizzes`
 
 ## Security
 
-- Admin tools only work on `localhost` (auto-redirects otherwise)
-- Configure Firebase security rules in Firebase Console
-- Never commit `.env.local` to version control
-- Static JSON fallback ensures app works without Firebase
+- ✅ **Authentication Required**: All database operations use Firebase Anonymous Authentication
+- ✅ **Secure Database Rules**: Configure security rules in Firebase Console (see `FIREBASE_SECURITY_RULES.md`)
+- ✅ **Admin Protection**: Admin tools only work on `localhost` (auto-redirects otherwise)
+- ✅ **Credential Safety**: Never commit `.env.local` to version control
+- ✅ **Graceful Fallback**: Static JSON fallback ensures app works without Firebase
+
+### Important: Enable Anonymous Authentication
+
+1. Go to [Firebase Console](https://console.firebase.google.com/)
+2. Select your project
+3. Navigate to **Authentication** → **Sign-in methods**
+4. Enable **Anonymous** authentication
+5. Configure database security rules (see `FIREBASE_SECURITY_RULES.md` for details)
 
 ## Troubleshooting
+
+**Q: Getting "permission denied" errors**
+- Enable Anonymous Authentication in Firebase Console (Authentication → Sign-in methods → Anonymous)
+- Configure security rules correctly (see `FIREBASE_SECURITY_RULES.md`)
+- Check browser console for authentication errors
 
 **Q: Admin page shows "Ladataan..."**
 - Check Firebase credentials in `.env.local`
@@ -104,16 +118,20 @@ Path: `/quizzes`
 
 ## Files Changed
 
-- `lib/firebase.ts` - Added database support
-- `lib/firebase-service.ts` - New: Firebase operations
+- `lib/firebase.ts` - Added Firebase Auth and anonymous authentication
+- `lib/firebase-service.ts` - Added authentication before database operations
+- `components/atoms/score.tsx` - Added authentication before writing scores
+- `app/tulokset/page.tsx` - Added authentication before reading leaderboard
 - `store/quiz-store.ts` - Added Firebase fetch with fallback
 - `app/admin/page.tsx` - New: Admin editor
 - `app/admin/migrate/page.tsx` - New: Migration tool
 - `.env.local.example` - New: Configuration template
+- `FIREBASE_SECURITY_RULES.md` - New: Security rules documentation
 - `app/admin/README.md` - New: Detailed documentation
 
 ## Support
 
 For detailed documentation, see:
+- `FIREBASE_SECURITY_RULES.md` - **IMPORTANT**: Security rules configuration
 - `/app/admin/README.md` - Complete admin tool documentation
 - `.env.local.example` - Configuration guide

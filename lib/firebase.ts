@@ -1,7 +1,9 @@
 import { initializeApp, getApps, getApp } from "firebase/app";
 import { getDatabase, Database } from "firebase/database";
+import { getAuth, signInAnonymously, Auth } from "firebase/auth";
 
 let database: Database | null = null;
+let auth: Auth | null = null;
 
 export function initFirebase() {
   if (!getApps().length) {
@@ -22,6 +24,10 @@ export function initFirebase() {
     database = getDatabase(getApp());
   }
   
+  if (!auth) {
+    auth = getAuth(getApp());
+  }
+  
   return database;
 }
 
@@ -30,4 +36,28 @@ export function getDb(): Database {
     database = initFirebase();
   }
   return database;
+}
+
+export function getFirebaseAuth(): Auth {
+  if (!auth) {
+    initFirebase();
+  }
+  return auth!;
+}
+
+/**
+ * Ensures the user is authenticated with Firebase using anonymous auth.
+ * This is required before writing to the database.
+ * @returns Promise that resolves when authentication is complete
+ */
+export async function ensureAuthenticated(): Promise<void> {
+  const firebaseAuth = getFirebaseAuth();
+  
+  // If already authenticated, return immediately
+  if (firebaseAuth.currentUser) {
+    return;
+  }
+  
+  // Sign in anonymously
+  await signInAnonymously(firebaseAuth);
 }
