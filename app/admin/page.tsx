@@ -269,7 +269,7 @@ export default function AdminPage() {
       });
       setCollapsedQuestions(questionsMap);
     }
-  }, [quizzes.length]);
+  }, [quizzes]);
 
   // Toggle quiz collapse state
   const toggleQuizCollapse = (quizIndex: number) => {

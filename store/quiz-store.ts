@@ -19,12 +19,20 @@ interface State {
   reset: () => void;
 }
 
+/**
+ * API URL based on environment - used for fallback to static JSON
+ */
 const API_URL =
   process.env.NODE_ENV === "production"
     ? "https://oulu2026pikkujouluvisa.vercel.app/"
     : "http://localhost:3000/";
 
-// helper: Fisher-Yates shuffle
+/**
+ * Fisher-Yates shuffle algorithm for randomizing array order
+ * Creates a shuffled copy without modifying the original array
+ * @param arr - Array to shuffle
+ * @returns Shuffled copy of the array
+ */
 function shuffle<T>(arr: T[]) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -34,16 +42,28 @@ function shuffle<T>(arr: T[]) {
   return a;
 }
 
-// localStorage keys: order:{playerKey}:{quizTitle}
+/**
+ * Generate localStorage key for storing question order
+ * Format: order:{playerName}:{quizTitle}
+ */
 function makeOrderKey(playerKey: string, quizTitle: string) {
   return `order:${playerKey}:${quizTitle}`;
 }
 
+/**
+ * Get the current player's key from localStorage
+ * Replaces spaces with underscores for consistency
+ * @returns Player key or 'guest' if not found
+ */
 function getPlayerKey() {
   if (typeof window === "undefined") return "guest";
   return (localStorage.getItem("playerName") || "guest").replace(/\s+/g, "_");
 }
 
+/**
+ * Load saved question order from localStorage for a specific player and quiz
+ * @returns Array of question IDs or null if not found/invalid
+ */
 function loadOrderIds(playerKey: string, quizTitle: string): number[] | null {
   if (typeof window === "undefined") return null;
   try {
@@ -56,6 +76,9 @@ function loadOrderIds(playerKey: string, quizTitle: string): number[] | null {
   }
 }
 
+/**
+ * Save question order to localStorage for persistence across sessions
+ */
 function saveOrderIds(playerKey: string, quizTitle: string, ids: number[]) {
   if (typeof window === "undefined") return;
   try {

@@ -2,16 +2,23 @@
 import { useQuestionStore } from "@/store/quiz-store";
 import { useState, useRef, useEffect } from "react";
 import Answer from "../atoms/answer";
-import { cn } from "@/lib/utils"; // added
+import { cn } from "@/lib/utils";
 
 type AnswersProps = {
+  /** Array of answer options to display */
   data: string[];
+  /** Callback when user submits an answer */
   handleAnswer: (questionId: number, answer: string | string[], timeTakenMs?: number) => void;
+  /** ID of the current question */
   questionId: number;
+  /** Callback to advance to next question */
   goNextQuestion: () => void;
 };
 
-// Fisher-Yates shuffle
+/**
+ * Fisher-Yates shuffle algorithm for randomizing answer order
+ * Ensures fair distribution and prevents answer pattern recognition
+ */
 function shuffle<T>(arr: T[]) {
   const a = arr.slice();
   for (let i = a.length - 1; i > 0; i--) {
@@ -21,6 +28,11 @@ function shuffle<T>(arr: T[]) {
   return a;
 }
 
+/**
+ * Answers component - Handles quiz answer selection and submission
+ * Supports both single-select and multi-select questions
+ * Includes timing mechanism for scoring and visual feedback
+ */
 const Answers = ({
   data,
   handleAnswer,
@@ -28,8 +40,8 @@ const Answers = ({
   goNextQuestion,
 }: AnswersProps) => {
   const [selectedAns, setSelectedAns] = useState<string | string[]>("");
-  const [isWaiting, setIsWaiting] = useState(false);
-  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [isWaiting, setIsWaiting] = useState(false); // Visual feedback delay state
+  const [isSubmitted, setIsSubmitted] = useState(false); // Prevent answer changes after submit
   const waitTimeoutRef = useRef<number | null>(null);
   const { questions, onCompleteQuestions, selectedQuizz } = useQuestionStore();
   const currentQuestion = questions.find((q) => q.id === questionId);
@@ -41,10 +53,10 @@ const Answers = ({
 
   const answerLabels = ["A", "B", "C", "D"];
 
-  // track when the question was shown
+  // Track when the question was shown for time-based scoring
   const startTimeRef = useRef<number>(performance.now());
 
-  // reset timer when questionId or data changes
+  // Reset timer when question changes
   useEffect(() => {
     startTimeRef.current = performance.now();
   }, [questionId, data]);
@@ -69,13 +81,18 @@ const Answers = ({
     setIsSubmitted(false);
     // reset question shown timer
     startTimeRef.current = performance.now();
-  }, [questionId, isMultiAnswer]); // only run when question changes
+  }, [questionId, isMultiAnswer, data]); // only run when question changes
 
+  /**
+   * Handles answer selection for both single and multi-select questions
+   * - Single-select: automatically submits and advances
+   * - Multi-select: toggles selection, requires explicit submit
+   */
   const handleSelectAnswer = (answer: string) => {
     if (isSubmitted) return; // Prevent changing answer after submission
     
     if (isMultiAnswer) {
-      // Multi-select mode
+      // Multi-select mode: toggle answer in/out of selection
       const currentSelections = Array.isArray(selectedAns) ? selectedAns : [];
       if (currentSelections.includes(answer)) {
         // Deselect
@@ -85,31 +102,30 @@ const Answers = ({
         setSelectedAns([...currentSelections, answer]);
       }
     } else {
-      // Single select mode - auto submit
+      // Single select mode - calculate time and auto submit
       const timeTakenMs = Math.max(0, performance.now() - startTimeRef.current);
       setSelectedAns(answer);
       setIsSubmitted(true);
-      handleAnswer(questionId, answer, timeTakenMs); // pass time to handler
+      handleAnswer(questionId, answer, timeTakenMs);
 
-      // start visual wait
+      // Start visual feedback period (1.5s delay)
       setIsWaiting(true);
-      // clear any previous timeout
       if (waitTimeoutRef.current) {
         window.clearTimeout(waitTimeoutRef.current);
       }
 
-      // Auto advance to next question after a delay (only if there is a next question)
+      // Auto advance to next question after delay
       waitTimeoutRef.current = window.setTimeout(() => {
         const currentIndex = questions.findIndex((q) => q.id === questionId);
         if (currentIndex >= 0 && currentIndex < questions.length - 1) {
-          // not the last question -> advance
+          // Not the last question - advance to next
           goNextQuestion();
           setSelectedAns("");
           setIsSubmitted(false);
-          startTimeRef.current = performance.now(); // reset for next question
+          startTimeRef.current = performance.now();
           setIsWaiting(false);
         } else {
-          // last question -> keep the same 1.5s wait visual, then complete quiz
+          // Last question - complete the quiz
           try {
             onCompleteQuestions();
           } catch (e) {
@@ -122,7 +138,10 @@ const Answers = ({
     }
   };
 
-  // Submit multi-answer selection
+  /**
+   * Handles submission for multi-select questions
+   * Called when user clicks the "Vastaa" (Submit) button
+   */
   const handleSubmitMultiAnswer = () => {
     if (!Array.isArray(selectedAns) || selectedAns.length === 0) return;
     
@@ -130,7 +149,7 @@ const Answers = ({
     setIsSubmitted(true);
     handleAnswer(questionId, selectedAns, timeTakenMs);
     
-    // start visual wait
+    // Start visual feedback period
     setIsWaiting(true);
     if (waitTimeoutRef.current) {
       window.clearTimeout(waitTimeoutRef.current);
