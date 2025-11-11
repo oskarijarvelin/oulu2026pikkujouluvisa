@@ -12,6 +12,11 @@ type AnswerProps = {
   isMultiAnswer?: boolean;
   isSubmitted?: boolean;
 };
+
+/**
+ * Answer component - Displays a single answer option with interactive selection
+ * Provides visual feedback for selection state and correctness after submission
+ */
 const Answer = ({
   answer,
   selectedAns,
@@ -23,6 +28,18 @@ const Answer = ({
   isSubmitted = false,
 }: AnswerProps) => {
   const isSelected = selectedAns === answer;
+  
+  // Determine ARIA label based on state
+  const getAriaLabel = () => {
+    if (isSubmitted && isSelected) {
+      if (isCorrectUserAnswer) {
+        return `${answerLabels[index]}: ${answer} - Oikea vastaus`;
+      } else {
+        return `${answerLabels[index]}: ${answer} - Väärä vastaus`;
+      }
+    }
+    return `${answerLabels[index]}: ${answer}`;
+  };
 
   return (
     <li>
@@ -30,6 +47,10 @@ const Answer = ({
         onClick={(e) => {
           handleSelectAnswer(answer);
         }}
+        disabled={isSubmitted && !isMultiAnswer}
+        aria-label={getAriaLabel()}
+        aria-pressed={isSelected}
+        aria-disabled={isSubmitted && !isMultiAnswer}
         className={cn(
           isSelected && "ring-perameri ring-1",
           isSubmitted && isCorrectUserAnswer && isSelected && "ring-green",
@@ -55,17 +76,18 @@ const Answer = ({
             isSubmitted && isCorrectUserAnswer === false && isSelected && "bg-puolukka",
             isSubmitted && isCorrectUserAnswer && isSelected && "bg-metsa"
           )}
+          aria-hidden="true"
         >
           {answerLabels[index]}
         </span>
         <span className="xl:text-lg text-left">{answer}</span>
         {isSubmitted && isCorrectUserAnswer && isSelected && (
-          <span className="ml-auto flex items-center gap-2">
+          <span className="ml-auto flex items-center gap-2" aria-hidden="true">
             <CircleCheck color="#14502E" />
           </span>
         )}
         {isSubmitted && isCorrectUserAnswer === false && isSelected && (
-          <span className="ml-auto flex items-center gap-2">
+          <span className="ml-auto flex items-center gap-2" aria-hidden="true">
             <CircleX color="#F1334B" />
           </span>
         )}
