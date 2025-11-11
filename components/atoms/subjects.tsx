@@ -143,6 +143,12 @@ const Subjects = ({ data }: SubjectsProps) => {
               }
             }}
             disabled={isPlayed}
+            aria-label={
+              isPlayed 
+                ? `${subject.title} - Jo pelattu, ${formatPoints(score.best!)} / ${score.total} pistettä`
+                : `Aloita ${subject.title} visa, ${score.total} kysymystä`
+            }
+            aria-disabled={isPlayed}
             className={cn(
               "flex items-center gap-x-4 bg-valkoinen dark:bg-perameri py-3 px-4 xl:py-5 rounded-2xl shadow-lg ring-1 ring-perameri/30 dark:ring-valkoinen transition-all",
               isPlayed
@@ -156,7 +162,7 @@ const Subjects = ({ data }: SubjectsProps) => {
                 isPlayed && "opacity-75"
               )}
               style={{ backgroundColor: iconBgColor, color: iconColor }}
-              aria-hidden
+              aria-hidden="true"
             >
               {subject.title?.charAt(0).toUpperCase() || "?"}
             </div>
@@ -180,14 +186,18 @@ const Subjects = ({ data }: SubjectsProps) => {
 
       {/* Total score display */}
       {totalScore.total > 0 && (
-        <div className="mt-6 p-4 bg-perameri rounded-xl text-center">
+        <div className="mt-6 p-4 bg-perameri rounded-xl text-center" role="status" aria-live="polite">
           <p className="text-valkoinen text-md lg:text-lg font-semibold">
             Kokonaispisteesi: {formatPoints(totalScore.score)}/{totalScore.total}
           </p>
         </div>
       )}
       <div>
-        <p className="mt-4 text-center underline text-perameri dark:text-jakala"><Link href="/tulokset">Hall of Fame &rarr;</Link></p>
+        <p className="mt-4 text-center underline text-perameri dark:text-jakala">
+          <Link href="/tulokset" aria-label="Näytä Hall of Fame -tulostaulu">
+            Hall of Fame &rarr;
+          </Link>
+        </p>
       </div>
     </div>
   );

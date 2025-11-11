@@ -8,6 +8,11 @@ import { AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
 
+/**
+ * Game component - Main quiz game interface
+ * Handles question display, answer selection, and progress tracking
+ * Includes animations and accessibility features
+ */
 const Game = () => {
   const { questions, currentQuestion, selectAnswer, goNextQuestion } =
     useQuestionStore();
@@ -22,7 +27,7 @@ const Game = () => {
   }, [currentQuestion]);
 
   return (
-    <>
+    <main role="main" aria-label="Visapeli">
       <div className="flex flex-col xl:justify-center xl:items-center gap-2 lg:px-6 w-full max-h-96 lg:mt-16 xl:mt-0 xl:max-h-full">
         <AnimatePresence
           initial={false}
@@ -37,7 +42,7 @@ const Game = () => {
               key={currentQuestion}
               className="flex flex-col gap-4"
             >
-              <p className="italic xs:text-sm md:text-md text-perameri dark:text-jakala xl:text-xl" >
+              <p className="italic xs:text-sm md:text-md text-perameri dark:text-jakala xl:text-xl" role="status" aria-live="polite">
                 Kysymys {currentQuestion + 1} / {questions.length}
               </p>
               <CurrentQuestion data={question} />
@@ -88,7 +93,7 @@ const Game = () => {
           </MotionDiv>
         )}
       </AnimatePresence>
-    </>
+    </main>
   );
 };
 
