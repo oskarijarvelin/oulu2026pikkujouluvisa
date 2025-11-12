@@ -51,7 +51,7 @@ const Answers = ({
   // Determine if this question has multiple correct answers
   const isMultiAnswer = Array.isArray(currentQuestion?.answer) && currentQuestion.answer.length > 1;
 
-  const answerLabels = ["A", "B", "C", "D"];
+  const answerLabels = ["A", "B", "C", "D", "E", "F", "G", "H"];
 
   // Track when the question was shown for time-based scoring
   const startTimeRef = useRef<number>(performance.now());
