@@ -109,7 +109,10 @@ const Answers = ({
       handleAnswer(questionId, answer, timeTakenMs);
 
       // Start visual feedback period (1.5s delay)
-      setIsWaiting(true);
+      // Defer setIsWaiting to next tick to allow store update to propagate
+      setTimeout(() => {
+        setIsWaiting(true);
+      }, 0);
       if (waitTimeoutRef.current) {
         window.clearTimeout(waitTimeoutRef.current);
       }
@@ -150,7 +153,10 @@ const Answers = ({
     handleAnswer(questionId, selectedAns, timeTakenMs);
     
     // Start visual feedback period
-    setIsWaiting(true);
+    // Defer setIsWaiting to next tick to allow store update to propagate
+    setTimeout(() => {
+      setIsWaiting(true);
+    }, 0);
     if (waitTimeoutRef.current) {
       window.clearTimeout(waitTimeoutRef.current);
     }
