@@ -1,5 +1,5 @@
 import { ref, get, set } from "firebase/database";
-import { getDb, ensureAuthenticated } from "./firebase";
+import { getDb } from "./firebase";
 import { Quizz } from "./types";
 
 const QUIZZES_PATH = "quizzes";
@@ -13,9 +13,6 @@ export async function fetchQuizzesFromFirebase(): Promise<Quizz[]> {
     if (!process.env.NEXT_PUBLIC_FIREBASE_DATABASE_URL) {
       throw new Error("Firebase not configured");
     }
-    
-    // Ensure user is authenticated before reading from database
-    await ensureAuthenticated();
     
     const db = getDb();
     const quizzesRef = ref(db, QUIZZES_PATH);
@@ -37,9 +34,6 @@ export async function fetchQuizzesFromFirebase(): Promise<Quizz[]> {
  */
 export async function saveQuizzesToFirebase(quizzes: Quizz[]): Promise<void> {
   try {
-    // Ensure user is authenticated before writing to database
-    await ensureAuthenticated();
-    
     const db = getDb();
     const quizzesRef = ref(db, QUIZZES_PATH);
     await set(quizzesRef, quizzes);
