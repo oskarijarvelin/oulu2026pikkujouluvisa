@@ -23,11 +23,11 @@ const Game = () => {
 
   useEffect(() => {
     setShouldAnimateQuestion(true);
-    setShouldAnimateAnswers(true); 
+    setShouldAnimateAnswers(true);
   }, [currentQuestion]);
 
   return (
-    <main role="main" aria-label="Visapeli">
+    <>
       <div className="flex flex-col xl:justify-center xl:items-center gap-2 lg:px-6 w-full max-h-96 lg:mt-16 xl:mt-0 xl:max-h-full">
         <AnimatePresence
           initial={false}
@@ -61,7 +61,7 @@ const Game = () => {
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               className="xs:mt-2 lg:mt-auto xl:mt-20 w-full "
-              key={currentQuestion} 
+              key={currentQuestion}
             >
               <Progress
                 total={questions.length}
@@ -93,7 +93,7 @@ const Game = () => {
           </MotionDiv>
         )}
       </AnimatePresence>
-    </main>
+    </>
   );
 };
 

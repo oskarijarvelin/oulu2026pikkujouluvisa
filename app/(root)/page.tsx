@@ -27,8 +27,7 @@ export default function Home() {
   return (
     <MaxWidthWrapper
       className={cn(
-        selectedQuizz && "xl:place-content-center",
-        "grid px-6 grid-cols-1 md:grid-cols-2 gap-10 xl:gap-20 lg:px-0 relative z-50 h-full"
+        selectedQuizz && "xl:place-content-center"
       )}
     >
       {!selectedQuizz && (
@@ -51,7 +50,11 @@ export default function Home() {
           </MotionDiv>
         </>
       )}
-      {selectedQuizz && hasCompleteAll === false && <Game />}
+      {selectedQuizz && hasCompleteAll === false && (
+        <main role="main" aria-label="Visapeli" className="grid px-6 grid-cols-1 md:grid-cols-2 gap-10 xl:gap-20 lg:px-0 relative z-50 h-full">
+          <Game />
+        </main>
+      )}
       {hasCompleteAll && (
         <>
           <MotionDiv
