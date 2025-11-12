@@ -42,6 +42,7 @@ const Answers = ({
   const [selectedAns, setSelectedAns] = useState<string | string[]>("");
   const [isWaiting, setIsWaiting] = useState(false); // Visual feedback delay state
   const [isSubmitted, setIsSubmitted] = useState(false); // Prevent answer changes after submit
+  const [pendingFeedback, setPendingFeedback] = useState(false); // Track if we're waiting for store update
   const waitTimeoutRef = useRef<number | null>(null);
   const { questions, onCompleteQuestions, selectedQuizz } = useQuestionStore();
   const currentQuestion = questions.find((q) => q.id === questionId);
@@ -61,6 +62,14 @@ const Answers = ({
     startTimeRef.current = performance.now();
   }, [questionId, data]);
 
+  // Watch for when the answer has been processed and start visual feedback
+  useEffect(() => {
+    if (pendingFeedback && isCorrectUserAnswer !== undefined) {
+      setPendingFeedback(false);
+      setIsWaiting(true);
+    }
+  }, [pendingFeedback, isCorrectUserAnswer]);
+
   // Watch questions store and call onCompleteQuestions when all answered.
   // Only complete if we're NOT currently waiting (to avoid racing with the 1.5s visual feedback)
   useEffect(() => {
@@ -79,6 +88,7 @@ const Answers = ({
     // clear previous selection when question changes
     setSelectedAns(isMultiAnswer ? [] : "");
     setIsSubmitted(false);
+    setPendingFeedback(false);
     // reset question shown timer
     startTimeRef.current = performance.now();
   }, [questionId, isMultiAnswer, data]); // only run when question changes
@@ -108,11 +118,8 @@ const Answers = ({
       setIsSubmitted(true);
       handleAnswer(questionId, answer, timeTakenMs);
 
-      // Start visual feedback period (1.5s delay)
-      // Defer setIsWaiting to next tick to allow store update to propagate
-      setTimeout(() => {
-        setIsWaiting(true);
-      }, 0);
+      // Signal that we're waiting for the store to update with answer feedback
+      setPendingFeedback(true);
       if (waitTimeoutRef.current) {
         window.clearTimeout(waitTimeoutRef.current);
       }
@@ -152,11 +159,8 @@ const Answers = ({
     setIsSubmitted(true);
     handleAnswer(questionId, selectedAns, timeTakenMs);
     
-    // Start visual feedback period
-    // Defer setIsWaiting to next tick to allow store update to propagate
-    setTimeout(() => {
-      setIsWaiting(true);
-    }, 0);
+    // Signal that we're waiting for the store to update with answer feedback
+    setPendingFeedback(true);
     if (waitTimeoutRef.current) {
       window.clearTimeout(waitTimeoutRef.current);
     }
