@@ -152,10 +152,9 @@ const Subjects = ({ data }: SubjectsProps) => {
           >
             <div
               className={cn(
-                "w-10 h-10 flex items-center justify-center rounded-lg text-lg font-bold select-none",
+                "text-perameri bg-perameri/20 w-10 h-10 flex items-center justify-center rounded-lg text-lg font-bold select-none",
                 isPlayed && "opacity-75"
               )}
-              style={{ backgroundColor: iconBgColor, color: iconColor }}
               aria-hidden
             >
               {subject.title?.charAt(0).toUpperCase() || "?"}
