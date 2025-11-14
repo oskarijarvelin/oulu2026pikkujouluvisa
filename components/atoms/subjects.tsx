@@ -152,7 +152,7 @@ const Subjects = ({ data }: SubjectsProps) => {
           >
             <div
               className={cn(
-                "text-perameri bg-perameri/20 w-10 h-10 flex items-center justify-center rounded-lg text-lg font-bold select-none",
+                "text-perameri bg-perameri/20 dark:text-valkoinen dark:bg-valkoinen/20 rounded w-12 h-10 flex items-center justify-center text-lg font-bold select-none",
                 isPlayed && "opacity-75"
               )}
               aria-hidden
